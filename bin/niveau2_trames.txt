@@ -1,0 +1,2134 @@
+# niveau.txt -- un niveau de prince_jeu, en clair. Importe du niveau 2 de SDLPoP : ne pas diffuser.
+#   python3 niveau2exl.py niveau.txt        -> prince_niveau.cram et niveau.png
+#
+# depart SALLE ETAGE CASE      (etage 0 en haut ; case 0 a gauche)
+# car N    : un caractere, 10 lignes de 8 points (# allume, . eteint). 252 au plus.
+# bloc N   : une case du jeu, 6 lignes de 4 numeros de caractere (0 = vide). 255 au plus.
+#            La 6e ligne est celle du sol : le personnage marche sur son bord haut.
+# salle N voisines G D H B     (numeros des salles voisines, 0 = aucune), puis
+#   3 lignes de 10 numeros de bloc : l'IMAGE de la salle, etage par etage ;
+#   3 lignes de 10 types de case   : la LOGIQUE (le moteur ne regarde que ca).
+#   Types : vide sol pics pilier grille bloque bouton_ferme linteau_sol gpilier_bas gpilier_haut potion fragile linteau miroir debris bouton_ouvre sortie_g sortie_d machoire torche mur squelette epee balcon_g balcon_d debris_torche potion_vie potion_grande potion_poison grille_ouverte
+#   L'image et la logique sont independantes : a vous de les garder d'accord.
+# bouton SALLE ETAGE CASE -> SALLE ETAGE CASE : ce bouton (bouton_ouvre ou bouton_ferme) commande cette
+#   grille (grille : fermee au depart ; grille_ouverte), ou la porte de sortie (sortie_g, avec un
+#   bouton_ouvre). Une ligne par grille commandee.
+#   Les images de la grille qui monte et du bouton enfonce sont fabriquees a la compilation.
+# garde SALLE ETAGE CASE gauche|droite NIVEAU PV : le garde de la salle (un au plus), tourne de ce cote,
+#   son niveau d'escrime (0 a 3) et ses points de vie.
+# pics BLOC -> BLOC : une case de pics qui a la premiere image prend la seconde quand ils sortent.
+# porte SALLE ETAGE CASE ouverte BLOC BLOC : la porte de sortie (sortie_g ; sortie_d a sa droite), et les
+#   images grande ouverte des deux cases a sa droite (le battant y est dessine, comme dans le jeu). Le bouton qui l'ouvre la fait monter ; ouverte, "haut"
+#   devant elle finit le niveau.
+# entree bouton SALLE ETAGE CASE : a chaque depart du niveau, le jeu appuie lui-meme sur ce bouton (niveau 1
+#   du jeu : le prince entre en tombant et la grille de la salle 5 se ferme).
+# murs GRAINE POINTS EPAIS [ECLATS] : les cases mur dessinees par le moteur (briques blanches, joints)
+#   au lieu de leurs blocs. GRAINE 0-255 : le tirage ; POINTS 0-20 : au plus autant de points noirs isoles
+#   par caractere ; EPAIS 0-100 : part des joints de 2 points ; ECLATS 0-20 (4 si absent) : au plus autant
+#   d'ecornures contre le mortier par caractere. Sans cette ligne : les blocs.
+# murs pierres GRAINE FISSURES EPAIS OMBRE : le meme placement, en pierres facon Macintosh (pierre blanche,
+#   joint noir, ombre en damier en bas et a droite, coins arrondis). FISSURES 0-100 : part des caracteres
+#   qui ont une fissure ; EPAIS 0-100 : part des joints de 2 points ; OMBRE 1-4 : largeur de l'ombre.
+# fragile BLOC -> BLOC BLOC [TEMPO] : une case fragile qui a la premiere image tremble en montrant la 2e,
+#   la 3e, puis la 1re (quand le prince arrive sur son etage, retombe sur cet etage, ou s'arrete dessus).
+#   TEMPO : chaque image dure autant de pas (1 a 8, 2 si absent ; le meme pour toutes). 14 lignes au plus.
+#   Les autres blocs de sol fragile du niveau prennent tout seuls l'animation de la 1re ligne (ses retouches).
+# enfonce SALLE ETAGE CASE BLOC [BLOC] : les images de ce bouton enfonce (sinon un sol nu du niveau) et de sa
+#   voisine de droite, ou sa dalle deborde (l'atelier les fait : case bouton, « Bouton en perspective »).
+# flamme HG HD BG BD : les 4 caracteres (haut gauche, haut droite, bas gauche, bas droite) de la flamme des
+#   torches ; le moteur y recopie a chaque pas une des 9 images de la flamme du jeu (lignes 2 a 19 du carre).
+#   Tout caractere de ces 4 numeros s'anime, partout : a ne pas employer ailleurs.
+# bulle CAR : le caractere des bulles des potions ; le moteur y recopie tour a tour les 7 images des bulles du jeu
+#   (tout ce caractere : a ne pas employer ailleurs).
+# couleur CAR COULEUR : ce caractere du decor, partout, dans cette couleur (noir rouge vert jaune bleu magenta cyan
+#   blanc) au lieu du blanc ; 7 lignes au plus. La ou passe le prince, la case prend sa couleur a lui.
+# plafond BLOC : un plafond mince (la ligne au-dessus de la salle) : chaque case non vide y prend le caractere
+#   de sa colonne (0-3) dans la 6e rangee de ce bloc (par exemple un joint puis 3 dalles). Sans : le bas des blocs.
+# debris BLOC : l'image de la case de sol ou se pose une dalle fragile tombee (elle devient des debris ;
+#   sinon, le bloc de debris le plus courant du niveau).
+# tombe SALLE ETAGE CASE BLOC : l'image de ce sol fragile une fois tombe (sinon, choisie par niveau2exl.py :
+#   le trou le plus courant du niveau a cote d'une case comme sa voisine de gauche).
+# Les numeros doivent se suivre a partir de 1. Tout ce qui suit un # est un commentaire.
+
+depart 5 1 3
+
+car 1
+.###.#.#
+.###.#.#
+.###.###
+.###.###
+.###.###
+########
+########
+########
+########
+########
+
+car 2
+#.##.###
+.###.###
+.##.####
+###.####
+########
+########
+########
+#######.
+#######.
+#######.
+
+car 3
+########
+########
+########
+########
+########
+########
+########
+########
+########
+########
+
+car 4
+##......
+.#......
+##......
+.#......
+##......
+.#......
+##......
+.#......
+##......
+.#......
+
+car 5
+........
+........
+.......#
+.......#
+.......#
+.......#
+.......#
+.......#
+.......#
+........
+
+car 6
+.....#..
+.....#..
+.....#..
+.....#..
+.....#..
+.....#..
+.....#..
+.....##.
+.....##.
+.....##.
+
+car 7
+.....##.
+.....##.
+.....###
+.....###
+####.###
+.###.###
+.###.###
+.###.###
+#.##.###
+#.##.###
+
+car 8
+........
+......#.
+......#.
+.....##.
+.###.#.#
+.##.##.#
+.##.#.##
+.#.##.##
+.#.##.##
+..##.###
+
+car 9
+..#.#...
+.#.#....
+#.#.#...
+##.#.#..
+#.#.#...
+##.#.#..
+#.#.#...
+##.#....
+#.#.#...
+.#.#....
+
+car 10
+#.#.#...
+.#.#.#..
+#.#.#...
+.#.#.#..
+#.#.#...
+.#......
+#.#.....
+........
+......#.
+.....#.#
+
+car 11
+..#.#.#.
+.#.#.#.#
+..#.#.#.
+.#.#.#.#
+..#.#.#.
+.#.#.#.#
+..#.#.#.
+.#.#.#.#
+..#.#.#.
+.#.#.#.#
+
+car 12
+..#.#.#.
+...#.#.#
+..#.#.#.
+.#.#.#..
+#.#.#...
+.#.#.#.#
+#.#.#.#.
+.#.#.#..
+#.#.#...
+........
+
+car 13
+#.#.#.#.
+.#.#.#..
+........
+........
+........
+........
+..#.#...
+.#.#...#
+#.#.#...
+.#.#...#
+
+car 14
+#.#.....
+.#.#...#
+#.#.#...
+.#.#...#
+#.#.#...
+.#.#...#
+#.#.....
+.#.#...#
+#.#.#...
+.#.#....
+
+car 15
+#.#.#.#.
+.#.#.#.#
+#.#.#.#.
+.#.#.#.#
+#.#.####
+.#.#####
+########
+########
+########
+########
+
+car 16
+#.#...#.
+.#.#.#.#
+#.#....#
+.#.#.#.#
+#.#.#..#
+.#.#.#.#
+#.#....#
+.......#
+.......#
+.....#..
+
+car 17
+#.#.#...
+.#.#....
+..#.....
+.#......
+......#.
+.....#.#
+..#.#.#.
+#..#.#.#
+#.#.#.#.
+#..#.#.#
+
+car 18
+.....#..
+.....#.#
+..#..#..
+.#.#.#.#
+#.#..#..
+.#.#.#.#
+#.#..#..
+.#.#.##.
+#.#..##.
+.#...##.
+
+car 19
+..#.#.#.
+.#.#.#..
+#.#.#.#.
+.#...#..
+#.#.#...
+.#.#.#..
+#.#.#...
+.#.#.#..
+#.#.#.#.
+.#.#.#.#
+
+car 20
+#.#..#..
+##.#.#.#
+##...#..
+##...##.
+##...##.
+###...##
+###...##
+###...##
+###.#.##
+.###.#.#
+
+car 21
+#.#..##.
+.#.#.##.
+#.#..###
+...#.###
+..#..###
+.#.#.###
+..#..###
+.#.#.###
+#.##.###
+#.##.###
+
+car 22
+........
+.......#
+......##
+.....###
+....####
+...#####
+..######
+.#######
+########
+########
+
+car 23
+........
+........
+........
+........
+#######.
+#######.
+#######.
+#######.
+###..##.
+##...###
+
+car 24
+#....#..
+##...#..
+##...#..
+##...##.
+##.#.##.
+###.#.##
+###.#.##
+###.#.##
+###.#.##
+.###.#.#
+
+car 25
+........
+........
+........
+........
+########
+########
+########
+########
+########
+########
+
+car 26
+.##.#.#.
+.#.#.#.#
+.####.##
+.#.#####
+.##.###.
+.#.#####
+.#######
+.#.#####
+.##.###.
+.#.#####
+
+car 27
+.....###
+........
+......##
+......##
+......##
+......##
+......##
+.......#
+.......#
+.......#
+
+car 28
+###.....
+........
+##......
+##......
+##......
+##......
+##......
+##......
+##......
+##......
+
+car 29
+########
+###.#.#.
+#.####..
+#####...
+####....
+###.....
+.#......
+#.......
+........
+........
+
+car 30
+........
+........
+......#.
+......##
+.....###
+.....##.
+......#.
+........
+....#...
+...###.#
+
+car 31
+........
+........
+........
+........
+........
+........
+.#......
+.#......
+##......
+###.....
+
+car 32
+....####
+.....###
+......##
+......##
+.....###
+.....###
+.....###
+......##
+......##
+....####
+
+car 33
+###.....
+###.....
+###.....
+###.....
+##......
+##......
+#.......
+#.......
+#.......
+####....
+
+car 34
+.####.##
+.#.#####
+.##.###.
+.#.#####
+.#######
+.#.#####
+.##.###.
+.#.#####
+.####.##
+.#.#.#.#
+
+car 35
+.##.#.#.
+.#.#.#.#
+.##.###.
+.#.#####
+.##.###.
+.#.#.#.#
+.##.#.#.
+.#.#.#.#
+.####.##
+.#.#####
+
+car 36
+.##.###.
+.#.#####
+.##.###.
+.#.#.#.#
+.##.#.#.
+.#.#.#.#
+.####.##
+.#.#####
+.##.###.
+.#.#####
+
+car 37
+.#######
+.#.#####
+.##.###.
+.#.#.#.#
+########
+########
+########
+########
+########
+########
+
+car 38
+##......
+.#......
+##......
+.#......
+########
+########
+###.#.##
+########
+########
+########
+
+car 39
+........
+........
+........
+.......#
+....####
+....####
+....####
+....####
+....####
+....####
+
+car 40
+........
+........
+......##
+....####
+..######
+..######
+..######
+..######
+..######
+..######
+
+car 41
+##......
+.#......
+##....##
+.#######
+########
+########
+########
+########
+########
+########
+
+car 42
+........
+........
+........
+........
+........
+........
+.#.#.#.#
+..#.#.#.
+.#.#.#.#
+..#.#.#.
+
+car 43
+........
+........
+........
+........
+........
+........
+.#.#.#.#
+#.#.#.#.
+.#.#.#.#
+#.#.#.#.
+
+car 44
+###.#.#.
+.#.#.#.#
+###.###.
+.#.#####
+###.###.
+##.#.#.#
+###.#.#.
+##.#.#.#
+#####.##
+##.#####
+
+car 45
+###.###.
+##.#####
+###.###.
+##.#.#.#
+###.#.#.
+##.#.#.#
+#####.##
+##.#####
+###.###.
+##.#####
+
+car 46
+#####.#.
+######.#
+#####.#.
+######.#
+#####.#.
+######.#
+#####.#.
+######.#
+#####.#.
+######.#
+
+car 47
+########
+########
+########
+########
+########
+########
+########
+########
+########
+........
+
+car 48
+........
+.#######
+########
+########
+########
+########
+########
+########
+########
+########
+
+car 49
+........
+####...#
+#####.#.
+######.#
+#####.#.
+######.#
+#####.#.
+######.#
+#####.#.
+######.#
+
+car 50
+#####.#.
+######..
+#####.#.
+######.#
+#####...
+######.#
+#####.#.
+######..
+#####...
+.......#
+
+car 51
+#.#.....
+.#......
+#.#.....
+.#......
+#.......
+.#......
+........
+........
+..#.....
+.#......
+
+car 52
+########
+########
+########
+########
+########
+########
+########
+###.####
+........
+.#######
+
+car 53
+########
+########
+########
+########
+########
+########
+########
+#####.##
+..#####.
+######.#
+
+car 54
+#.#.....
+.#......
+#.#.....
+.#......
+#.......
+.#......
+#.#.....
+.#......
+#.#.....
+........
+
+car 55
+#####.#.
+######.#
+#####.#.
+######.#
+#####.#.
+#####..#
+#.#.####
+########
+########
+########
+
+car 56
+........
+.......#
+#.#..###
+...#####
+.#######
+########
+########
+#######.
+#######.
+#######.
+
+car 57
+#.#...#.
+.#.#.#.#
+#.#...#.
+.#.#.#.#
+#.#.#.#.
+.#.#.#..
+#.#.....
+........
+......#.
+.....#.#
+
+car 58
+#.#.#.#.
+.#.#...#
+#.#.#...
+.#.#....
+#.#.#.#.
+.#.#.#.#
+#.#.#.#.
+.#.#.#..
+#.#.#...
+...#....
+
+car 59
+#.#.#...
+.#.#....
+#.#.....
+.#......
+......#.
+.....#.#
+..#.#.#.
+.#.#.#.#
+#.#.#.#.
+.#.#.#.#
+
+car 60
+......#.
+.....#.#
+..#.#.#.
+.#.#...#
+#.#...#.
+.#.#.#.#
+#.#.#.#.
+.#.#.#.#
+#.#.#.#.
+.#.#.#.#
+
+car 61
+#.#.#.#.
+.#.#.#.#
+#.#.#.#.
+.#.#.#.#
+#.#.#.#.
+.#.#.#.#
+#.#.#.#.
+.#.#.#.#
+#.#.#.#.
+.#.#.#.#
+
+car 62
+.######.
+.#######
+.######.
+.#######
+.######.
+.#######
+.######.
+.#######
+.######.
+.#######
+
+car 63
+........
+........
+........
+........
+########
+#######.
+#####...
+###.....
+#.......
+........
+
+car 64
+#.#.#.#.
+.#.#.#.#
+#.#.#.#.
+...#.#.#
+..#.#.#.
+.#.#.#.#
+#.#.#.#.
+.#.#....
+#.#.....
+.#......
+
+car 65
+#####...
+###.....
+#.......
+........
+......#.
+.....#.#
+..#.#.#.
+.#.#.#.#
+..#.#.#.
+.....#..
+
+car 66
+........
+........
+........
+########
+########
+########
+########
+########
+########
+########
+
+car 67
+########
+########
+########
+########
+########
+########
+########
+########
+........
+........
+
+car 68
+........
+........
+........
+........
+......##
+.....###
+....####
+...#####
+..######
+.#######
+
+car 69
+#####..#
+###..###
+###.####
+###.####
+##.#####
+#..#####
+#####...
+########
+########
+########
+
+car 70
+##.#####
+###.####
+####.###
+####..##
+#####.##
+######.#
+#######.
+.#######
+########
+########
+
+car 71
+........
+........
+........
+........
+########
+########
+########
+#.####..
+#..###.#
+##.#####
+
+car 72
+########
+########
+########
+########
+########
+########
+########
+#######.
+######.#
+####...#
+
+car 73
+........
+........
+........
+........
+##......
+##......
+##......
+##......
+##......
+##......
+
+car 74
+........
+........
+........
+.#######
+.#######
+#.......
+########
+########
+########
+########
+
+car 75
+........
+........
+..######
+...#####
+###.####
+###.####
+##..####
+#.######
+.#######
+.#######
+
+car 76
+#.######
+#.######
+##.#####
+###.....
+########
+########
+########
+########
+########
+########
+
+car 77
+##.#####
+##.#####
+..######
+########
+########
+########
+########
+########
+########
+########
+
+car 78
+........
+........
+##......
+#.......
+.#######
+.#######
+..######
+##.#####
+###.####
+###.####
+
+car 79
+........
+........
+........
+........
+########
+######.#
+#####.##
+###.####
+##.#####
+.#######
+
+car 80
+########
+########
+########
+########
+########
+#######.
+######.#
+####.###
+###.####
+#.......
+
+car 81
+#######.
+#####.##
+####.###
+##.#####
+#.######
+########
+#####.##
+..#####.
+######.#
+........
+
+car 82
+........
+........
+........
+#######.
+#######.
+#######.
+#######.
+###..##.
+##...###
+########
+
+car 83
+........
+........
+........
+#######.
+#####...
+####..#.
+##...#..
+#..#....
+..##.#..
+........
+
+car 84
+########
+########
+########
+########
+######..
+#####..#
+###...##
+....#.##
+...####.
+.#####.#
+
+car 85
+........
+........
+........
+.....###
+###.####
+##.#####
+#.######
+########
+########
+########
+
+car 86
+########
+########
+########
+########
+#######.
+######.#
+#####.##
+###.####
+##.#####
+#.......
+
+car 87
+####.###
+###.####
+#.######
+.#######
+########
+########
+#####.##
+..#####.
+######.#
+........
+
+car 88
+........
+........
+........
+########
+########
+########
+######..
+#####..#
+####..##
+###..###
+
+car 89
+........
+........
+........
+##......
+#..#####
+..######
+.#######
+########
+########
+########
+
+car 90
+########
+########
+#######.
+######..
+#####..#
+####..##
+##...###
+#..#####
+..######
+.#######
+
+car 91
+........
+........
+........
+......##
+.....###
+....####
+...#####
+..######
+.#######
+########
+
+car 92
+.......#
+......##
+.....###
+....####
+...#####
+..######
+.#######
+########
+########
+........
+
+car 93
+##..####
+...#####
+.#######
+########
+########
+########
+########
+########
+########
+########
+
+car 94
+........
+........
+........
+......##
+####.###
+###.####
+##.#####
+.#######
+########
+########
+
+car 95
+#####.##
+####.###
+##.#####
+#.######
+.#######
+########
+#####.##
+..#####.
+######.#
+........
+
+car 96
+#####.##
+####.###
+##.#####
+#.######
+.#######
+########
+########
+########
+########
+........
+
+car 97
+#.#.#.#.
+.#.#.#.#
+#.#..###
+.#..####
+##.#####
+#.######
+.#######
+########
+########
+########
+
+car 98
+........
+........
+########
+########
+########
+########
+########
+########
+########
+########
+
+car 99
+#.#.#.#.
+.#.#.#.#
+#.#.#.##
+.#.#.##.
+#.#.##.#
+.#.##.##
+####.###
+##.#####
+#.......
+........
+
+car 100
+###.####
+##.#####
+.#######
+########
+########
+#####.##
+..#####.
+######.#
+........
+........
+
+car 101
+........
+........
+########
+########
+########
+######..
+#####...
+####....
+###.....
+##......
+
+car 102
+........
+........
+.......#
+.#....#.
+....#...
+........
+..#..#..
+........
+....#...
+.....#.#
+
+car 103
+.#.#.##.
+.#..#...
+........
+....#...
+....#...
+........
+....#...
+##....#.
+........
+........
+
+car 104
+####..##
+..#.....
+..#..#..
+.....#..
+.....#..
+.....#..
+......#.
+......#.
+........
+#.#..#.#
+
+car 105
+#....#.#
+.......#
+.......#
+.......#
+........
+........
+........
+........
+........
+........
+
+car 106
+.......#
+##.##.#.
+#.......
+...#....
+...#....
+........
+...#....
+...#....
+......#.
+.###....
+
+car 107
+........
+#.###...
+.....#.#
+..#.....
+........
+........
+........
+........
+........
+........
+
+car 108
+........
+........
+........
+........
+........
+.#......
+........
+..#.....
+........
+..#.....
+
+car 109
+###.....
+###.....
+###.....
+###.....
+##......
+##......
+#.......
+#.......
+#.......
+###.....
+
+car 110
+#.......
+........
+#.......
+........
+#.......
+........
+#.......
+........
+........
+........
+
+car 111
+.....###
+........
+......##
+......##
+......##
+......##
+......##
+........
+.......#
+........
+
+car 112
+........
+........
+#.......
+........
+#.......
+........
+#.......
+........
+#.......
+........
+
+car 113
+########
+#.#.#.#.
+########
+#.#.#.#.
+########
+#...#.#.
+########
+########
+########
+#.#.#.#.
+
+car 114
+###.....
+........
+##......
+#.......
+##......
+#.......
+##......
+#.......
+##......
+#.......
+
+car 115
+.#######
+#.#.#.#.
+########
+#.#.#.#.
+########
+#.#.#.#.
+########
+########
+########
+#.#.#.#.
+
+car 116
+#.#.....
+.#......
+#.#.....
+.#......
+#.#.....
+.#......
+#.#.....
+.#......
+#.#.....
+.#......
+
+car 117
+........
+........
+........
+........
+........
+........
+........
+........
+....#...
+........
+
+car 118
+........
+........
+........
+........
+........
+.#......
+..#.....
+........
+..#.....
+........
+
+car 119
+........
+........
+........
+.#......
+..#.....
+........
+..#.....
+........
+..#.....
+........
+
+car 120
+..#.....
+........
+..#.....
+........
+........
+........
+........
+........
+........
+........
+
+car 121
+......#.
+........
+........
+........
+........
+........
+........
+........
+........
+........
+
+car 122
+........
+........
+........
+.#.#.#.#
+#.#.#.#.
+.#.#.#.#
+#.#.#.#.
+.#.#.#.#
+#.#.#.#.
+........
+
+car 123
+#.#.#.#.
+.#.#.#.#
+#.#.#.#.
+.#.#.#.#
+########
+#.#.#.#.
+########
+#.#.#.#.
+########
+#.#.#.#.
+
+car 124
+........
+........
+........
+.....#..
+........
+.#.#.#.#
+........
+........
+........
+........
+
+car 125
+........
+........
+........
+........
+########
+#.#.#.#.
+########
+#.#.#.#.
+########
+#.#.#.#.
+
+car 126
+.....##.
+.....##.
+.....###
+.....###
+####.###
+..#..###
+.###.###
+..#..###
+#.##.###
+#.#..###
+
+bloc 1   # surtout : sol (27 fois en tout)
+  0   0   0   0
+  0   0   0   0
+  0   0   0   0
+  0   0   0   0
+  0  68  25  25
+ 22   3   3   3
+
+bloc 2   # surtout : sol (72 fois en tout)
+  0   0   0   0
+  0   0   0   0
+  0   0   0   0
+  0   0   0   0
+ 25  25  25  25
+  3   3  93   3
+
+bloc 3   # surtout : sol (10 fois en tout)
+  9  11  12   0
+ 10  13  60   0
+ 61  14  58   0
+ 57  59  60   0
+ 61  61  15  25
+ 15  53   3   3
+
+bloc 4   # surtout : pilier (42 fois en tout)
+  0  48  49  54
+  0  47  50  51
+  0   3  46  54
+  0  52  53  51
+ 25   3  46  54
+  3   3  55  56
+
+bloc 5   # surtout : vide (5 fois en tout)
+  9  11  12   0
+ 10  13  60   0
+ 61  14  58   0
+ 57  59  60   0
+ 61  61  64   0
+ 57   0   0   0
+
+bloc 6   # surtout : sortie_g (2 fois en tout)
+  0  30  31   0
+  0  32  33   0
+  0  27  28   0
+  0   0   0   0
+ 25  25  25  25
+ 53   3   3  69
+
+bloc 7   # surtout : grille (3 fois en tout)
+  0   0   0  62
+  0   0   0  62
+  0   0   0  62
+  0   0   0  62
+ 25  25  25  62
+  3   3   3   3
+
+bloc 8   # surtout : pilier (5 fois en tout)
+  9  48  49  54
+ 10  47  50  51
+ 61   3  46  54
+ 57  52  53  51
+ 61   3  46  54
+ 15   3  55  56
+
+bloc 9   # surtout : pilier (12 fois en tout)
+  0  48  49  54
+  0  47  50  51
+  0   3  46  54
+  0  52  53  51
+  0   3  46  54
+ 22   3  55  56
+
+bloc 10   # surtout : vide (16 fois en tout)
+  9  11  12   0
+ 10  13  60   0
+ 61  14  58   0
+ 57  59  60   0
+ 61  61  64   0
+ 57  59  60   0
+
+bloc 11   # surtout : debris (8 fois en tout)
+  9  11  12   0
+ 10  13  60   0
+ 61  14  58   0
+ 57  59  60   0
+ 61  61  15  25
+ 15   3   3   3
+
+bloc 12   # surtout : pics (5 fois en tout)
+  0   0   0   0
+  0   0   0   0
+  0   0   0   0
+  0   0   0   0
+ 23  71  25  25
+ 72  70  69   3
+
+bloc 13   # inutilise
+  9  11  12   0
+ 10  13  60   0
+ 61  14  58   0
+ 16  17  18   0
+ 19  20  21   8
+ 15   1   3   2
+
+bloc 14   # inutilise
+  0   0   0   0
+  0   0   0   0
+  0   0   0   0
+  5   0   6   0
+ 23  24   7   8
+  3   1   3   2
+
+bloc 15   # surtout : vide (1 fois en tout)
+  0   0   0   0
+  0   0   0   0
+  0   0   0   0
+  0   0   0   0
+ 25  25  25  25
+ 35  61  61  61
+
+bloc 16   # surtout : vide (2 fois en tout)
+  0   0   0   0
+  0   0   0   0
+  0   0   0   0
+  0   0   0   0
+ 25  25  25  73
+ 61  61  36   4
+
+bloc 17   # inutilise
+ 26   4   0   0
+ 34   4   0   0
+ 35   4   0  39
+ 36   4  40   3
+ 37  41  48  48
+  3   3   3   3
+
+bloc 18   # surtout : vide (8 fois en tout)
+  0   0   0   0
+  0   0   0   0
+  0   0   0   0
+  0   0   0   0
+ 23  25  63   0
+ 53  65  60   0
+
+bloc 19   # inutilise
+  0   0   0   0
+  0   0   0   0
+  0   0   0   0
+  0   0   0   0
+ 66  66  25  25
+ 67  67   3   3
+
+bloc 20   # inutilise
+  0   0   0   0
+  0   0   0   0
+  0   0   0   0
+  0   0   0   0
+ 25  25  66  66
+  3   3  67  67
+
+bloc 21   # surtout : debris (13 fois en tout)
+  0   0   0   0
+  0   0   0   0
+  0   0   0   0
+  0   0   0   0
+ 25  25  25  79
+ 72   3   3   3
+
+bloc 22   # surtout : potion_vie (5 fois en tout)
+  0   0   0   0
+  0   0   0   0
+  0   0   0   0
+  0 102   0   0
+ 25  75  78  25
+  3  76  77   3
+
+bloc 23   # surtout : bouton_ferme (2 fois en tout)
+  0   0   0   0
+  0   0   0   0
+  0   0   0   0
+  0   0   0   0
+ 25  25  94  66
+ 80  95  47  47
+
+bloc 24   # surtout : bouton_ouvre (2 fois en tout)
+  0   0   0   0
+  0   0   0   0
+  0   0   0   0
+  0   0   0   0
+ 25  25  94  66
+ 80  96  47  47
+
+bloc 25   # surtout : vide (1 fois en tout)
+  0   0   0   0
+  0   0   0   0
+  0   0   0   0
+  0   0   0   0
+ 98 101   0   0
+ 29   0   0   0
+
+bloc 26   # surtout : sol (24 fois en tout)
+  0  30  31   0
+  0  32  33   0
+  0  27  28   0
+  0   0   0   0
+ 71  25  25  25
+ 93   3   3  72
+
+bloc 27   # inutilise
+  0   0   0   0
+  0   0   0   0
+  0   0   0   0
+  0   0   0   0
+  0   0   0   0
+ 42  43  43  43
+
+bloc 28   # surtout : vide (42 fois en tout)
+  0   0   0   0
+  0 108   0   0
+  0 107 106   0
+  0 104 105   0
+  0   0 103   0
+  0   0   0   0
+
+bloc 29   # surtout : gpilier_haut (2 fois en tout)
+  0  32   3 109
+  0  32   3 110
+  0 111   3 112
+  0 111   3 112
+  0 111   3 112
+  0 111   3 112
+
+bloc 30   # surtout : vide (2 fois en tout)
+113 114   0   0
+115 116   0   0
+115 116   0   0
+115 116   0   0
+115 116   0   0
+115 116   0   0
+
+bloc 31   # surtout : vide (1 fois en tout)
+117   0   0   0
+  0   0 118   0
+  0 119 120   0
+121 121 121   0
+122 122 122 122
+ 36 123 123 123
+
+bloc 32   # surtout : gpilier_bas (1 fois en tout)
+  0 111   3 112
+  0 111   3 112
+124 111   3 112
+  0 111   3 112
+125 126   3  30
+113 113 113  15
+
+bloc 33   # surtout : torche (1 fois en tout)
+115 116   0   0
+115 116   0   0
+115 116   0   0
+ 76 116   0   0
+ 52 109 125 125
+113 113 113 113
+
+bloc 34   # surtout : sortie_d (1 fois en tout)
+ 26   4 110 110
+ 34   4   5 125
+ 35   4  32 109
+ 36   4  32 109
+123 125 115   3
+113 113 113 113
+
+bloc 35   # surtout : torche (1 fois en tout)
+110 110  26   4
+  0   0  34   4
+  0   0  35   4
+  0   0  36   4
+115 115 123 125
+113 113 113 113
+
+bloc 36   # surtout : gpilier_bas (1 fois en tout)
+  0 111   3 112
+  0 111   3 112
+  0 111   3 112
+  0 111   3 112
+125 126   3  30
+113 113 113  15
+
+bloc 37   # surtout : vide (1 fois en tout)
+115 116   0   0
+115 116   0   0
+115 116   0   0
+ 76 116   0   0
+ 52 109 125 117
+110  59  60   0
+
+bloc 38   # surtout : vide (1 fois en tout)
+113 111  26   0
+118 111  26   0
+118 111  26   0
+113 111  26   0
+125 113 125 117
+110  59  60   0
+
+bloc 39   # surtout : potion_vie (2 fois en tout)
+  0  30  31   0
+  0  32 109   0
+  0 111 114   0
+  0 117 110 117
+125 125 125  74
+113 113 113 113
+
+bloc 40   # surtout : linteau (1 fois en tout)
+  0   0   0  26
+  0   0   0  26
+  0   0   0  26
+  0   0   0  26
+  0   0   0  26
+  0   0   0  26
+
+bloc 41   # surtout : potion_grande (1 fois en tout)
+  0  30  31   0
+  0  32 109   0
+  0 111 114   0
+  0 117 110 108
+125 125 125  98
+113 113 113 113
+
+bloc 42   # surtout : sortie_d (1 fois en tout)
+ 26  61  61  61
+ 34   4 115 115
+ 35   4 115 115
+ 36  61  61  61
+123 123 123 123
+113 113 113 113
+
+bloc 43   # surtout : torche (1 fois en tout)
+ 61  61  26   4
+115 115  34   4
+115 115  35   4
+ 61  61  36   4
+123 123 123 125
+113 113 113 113
+
+bloc 44   # inutilise
+  0   0  26   4
+  5 122  34   4
+123 123  44   4
+  3   3  45   4
+115 115 123 125
+113 113 113 113
+
+salle 1 voisines 0 6 22 0
+  0   8  18  28   0   9   1   2   2   2
+  0   0  10   0   1   4   2  26   2  26
+  0   0  11  21   0   0   0   0   0   0
+mur pilier vide vide vide pilier sol sol sol sol
+mur mur vide vide sol pilier torche sol torche sol
+mur mur debris debris mur mur mur mur mur mur
+
+salle 2 voisines 0 21 9 0
+  0   0  10  28   0   0   3   4   1   4
+  0   0  10  28   0   0   0   0   0   0
+  0   0  11  21  21   0   0   0   0   0
+mur mur vide vide vide mur sol pilier sol pilier
+mur mur vide vide vide mur mur mur mur mur
+mur mur debris debris debris mur mur mur mur mur
+
+salle 3 voisines 22 0 0 6
+  0   0   0   0   0   0   0   0   0   0
+  4  18  28   0   0   0   0   0   0   0
+  0   3   2   2   4  22   2   0   0   0
+mur mur mur mur mur mur mur mur mur mur
+pilier vide vide vide mur mur mur mur mur mur
+mur sol fragile sol pilier potion_vie sol mur mur mur
+
+salle 4 voisines 6 5 0 10
+  0   5   0   0   0  28   0   0   0   0
+  9   1   2   2  26   2  26   2   2   2
+  0  10   1   4   1   2   4   1   2   0
+mur vide vide vide vide vide vide vide vide vide
+pilier sol sol torche sol torche sol fragile fragile sol
+mur vide sol pilier sol sol pilier sol sol mur
+
+salle 5 voisines 4 0 0 0
+ 29  30   0  31  16   0  29  30   0   0
+ 32  33   6  34  35  26  36  37   0   0
+  0   0   0   0   0   0   0  11  21   0
+gpilier_haut vide vide vide vide vide gpilier_haut vide vide mur
+gpilier_bas torche sortie_g sortie_d torche sol gpilier_bas vide vide mur
+mur mur mur mur mur mur mur debris debris mur
+
+salle 6 voisines 1 4 3 0
+  2   4  28   0   0   0   0   0   0   0
+  2   4   1  12   4   2   2   2  26   4
+  0   0   0   0   0   3   4  22   2   0
+sol pilier vide vide mur mur mur mur mur mur
+sol pilier sol pics pilier fragile sol torche sol pilier
+mur mur mur mur mur sol pilier potion_vie sol mur
+
+salle 7 voisines 13 18 0 0
+  0   5   0   0  28   0   1   2   2   7
+  9   1   2  26   2  26   4  18  28   0
+  0   0   0   0   0   0   0  11   2   4
+mur vide vide vide vide vide sol sol sol grille
+pilier sol torche sol torche sol pilier vide vide mur
+mur mur mur mur mur mur mur pics sol pilier
+
+salle 8 voisines 12 0 0 13
+  0   0   0   0   0   0   0   0   0   0
+  0   0   5  28   0   0   0   0   0   0
+  2   4  22  21  21   0   0   0   0   0
+mur mur mur mur mur mur mur mur mur mur
+mur mur vide vide vide mur mur mur mur mur
+sol pilier potion_vie debris debris mur mur mur mur mur
+
+salle 9 voisines 0 23 0 2
+ 10   0   0  28   0   0   0   0   0   0
+  3  26  18  28   0   9   2  26   2   4
+  0   0  10  28   0   9   2   0   0   0
+vide vide vide vide vide mur mur mur mur mur
+torche bouton_ouvre vide vide vide pilier torche sol sol pilier
+mur mur vide vide vide pilier fragile mur mur mur
+
+salle 10 voisines 0 0 4 0
+  0  10  28   0   0   0   0   0   0   0
+  0  10  28   9   1   2   4  18  28   0
+  0  11  12   0   0   0   0  11  21   0
+mur vide vide mur mur mur mur mur mur mur
+mur vide vide pilier sol sol pilier vide vide mur
+mur debris pics mur mur mur mur debris debris mur
+
+salle 11 voisines 18 22 0 0
+ 38   0   0   0   0   0   0   0   0   0
+  3  24   4   1   2  26   2  26   2   4
+  0   0   0   0   0   0   0   0   0   0
+vide vide mur mur mur mur mur mur mur mur
+sol bouton_ouvre pilier sol torche sol torche sol sol pilier
+mur mur mur mur mur mur mur mur mur mur
+
+salle 12 voisines 20 8 0 15
+  0   0   0   0   0   0   0   0   0   0
+  0   0   0   0   0  10  28   0   0   0
+  1   0   0   0   0   3  39   4   2   2
+mur mur mur mur mur mur mur mur mur mur
+mur mur mur mur mur vide vide mur mur mur
+sol mur mur mur mur torche potion_vie pilier fragile sol
+
+salle 13 voisines 15 7 8 0
+  2   4  18  28   0  40   0   0   0   0
+  0   0   3  22  23   7   4   2  39   4
+  0   0   0   0   0   0   0   0   0   0
+sol pilier vide vide vide linteau mur mur mur mur
+mur mur sol 170 bouton_ferme grille_ouverte pilier torche potion_vie pilier
+mur mur mur mur mur mur mur mur mur mur
+
+salle 14 voisines 0 0 21 0
+  0   0  10  28   0   0   0   0   0   0
+  0   0  10  28   0   0   0   0   0   0
+  0   0  11  21   0   0   0   0   0   0
+mur mur vide vide mur mur mur mur mur mur
+mur mur vide vide mur mur mur mur mur mur
+mur mur debris debris mur mur mur mur mur mur
+
+salle 15 voisines 16 13 12 17
+  0   0   0   0   0   0  28   9   1   2
+  2   2  26  26   2  18  28   0   0   0
+  0   0   0   0   0  10  28   0   0   0
+vide vide vide vide vide vide vide pilier sol sol
+sol torche torche sol sol vide vide mur mur mur
+mur mur mur mur mur vide vide mur mur mur
+
+salle 16 voisines 19 15 20 0
+  0   0   0   3   2   4  28   0  28   0
+  2  26   4   1   2   4   2  26   2  26
+  0   0   0   0   0   0   0   0   0   0
+mur mur mur sol sol pilier vide vide vide vide
+torche sol pilier sol sol pilier torche sol torche sol
+mur mur mur mur mur mur mur mur mur mur
+
+salle 17 voisines 0 0 15 0
+  0   0   0   0   0  10  28   0   0   0
+  0   0   0   0   0  10  28   0   0   0
+  0   0   0   0   0  11  21   0   0   0
+mur mur mur mur mur vide vide mur mur mur
+mur mur mur mur mur vide vide mur mur mur
+mur mur mur mur mur debris debris mur mur mur
+
+salle 18 voisines 7 11 0 0
+  4   1  23   2   2   2  26  24   4   7
+  0   0   0   8  28   0   0   0   0   0
+  9   1   2   4   1   4  22   2   0   0
+pilier sol bouton_ferme torche fragile torche sol bouton_ouvre pilier grille
+mur mur mur pilier vide mur mur mur mur mur
+pilier sol sol pilier sol pilier potion_vie sol mur mur
+
+salle 19 voisines 21 16 24 0
+  0   0   0   0   0   0   0   0   0   0
+  9   1   2   2  12   2  26   2   2   4
+  0   0   0   0   0   0   0   0   0   0
+mur mur mur mur mur mur mur mur mur mur
+pilier sol sol torche pics torche sol sol sol pilier
+mur mur mur mur mur mur mur mur mur mur
+
+salle 20 voisines 24 12 0 16
+  0   0   0   0   0   0   0   0   0   0
+  0   3  41   2   2   2  25  28   0   0
+  0   0   0  10  28   9  12  12  21   4
+mur mur mur mur mur mur mur mur mur mur
+mur torche potion_grande sol sol sol vide vide vide mur
+mur mur mur vide vide pilier pics pics debris pilier
+
+salle 21 voisines 2 19 23 14
+  1   4  28  28   0   0   0   0   0   0
+  0   8  18  28   9   2  26   2  26   4
+  0   0  10   0   0   0   0   0   0   0
+sol pilier vide vide mur mur mur mur mur mur
+mur pilier vide vide pilier torche sol torche sol pilier
+mur mur vide vide mur mur mur mur mur mur
+
+salle 22 voisines 11 3 0 1
+  0   0   0   0   0   0   0   0   0   0
+  1   4  28  28   0   0   0   0   3   2
+  0   8  28  28   0   0   0   0   0   0
+mur mur mur mur mur mur mur mur mur mur
+sol pilier vide vide mur mur mur mur sol sol
+mur pilier vide vide mur mur mur mur mur mur
+
+salle 23 voisines 9 24 0 21
+  0   0   5  28  15  16   0   0   0   0
+  1   4   2   6  42  43  26   4   1   2
+  0   8  28  28   9   1   2   4   1   2
+mur mur vide vide vide vide vide mur mur mur
+sol pilier torche sortie_g sortie_d torche sol pilier sol sol
+mur pilier vide vide pilier sol sol pilier sol sol
+
+salle 24 voisines 23 20 0 19
+  0   0   0   0   0   0   5   0  28   0
+  4   1   2  26  26   4  28   0  28   0
+  4   1   2   2   2   4  21  21  21   0
+mur mur mur mur mur mur vide vide vide mur
+pilier sol torche torche sol pilier vide vide vide mur
+pilier sol sol sol sol pilier debris debris debris mur
+
+bouton 9 1 1 -> 23 1 3
+bouton 11 1 1 -> 18 0 9
+bouton 13 1 4 -> 13 1 5
+bouton 18 0 2 -> 7 0 9
+bouton 18 0 7 -> 7 0 9
+bouton 18 0 7 -> 18 0 9
+pics 12 -> 14
+pics 11 -> 13
+garde 4 1 0 droite 1 3
+garde 7 1 1 droite 2 3
+garde 11 1 3 droite 1 3
+garde 15 1 0 droite 1 3
+garde 24 1 0 droite 3 3
+porte 23 1 3 ouverte 17 44
+murs pierres 7 50 20 3
+fragile 2 -> 19 20 1
+plafond 27
+couleur 30 jaune
+couleur 31 jaune
+couleur 32 jaune
+couleur 33 jaune
+couleur 102 rouge
+flamme 30 31 32 33
+bulle 102
