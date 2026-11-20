@@ -1,5 +1,7 @@
 # EXELPRINCE — Prince of Persia sur EXL100 / EXELTEL
 
+https://youtube.com/shorts/r7IgiXwikTA
+
 **Version 1 — 19-11-2026.** 
 Un moteur de jeu « à la Prince of Persia » en assembleur TMS7020 pour
 l'Exelvision EXL100 / EXELTEL - mode texte semi_graphique (non bitmap),
