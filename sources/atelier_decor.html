@@ -1,0 +1,1169 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Atelier décor EXLPRINCE</title></head><body>
+
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Établi : une barre d'outils, l'écran de la salle au centre, les éditeurs à droite. L'écran reste noir comme sur l'EXL100. */
+:root{
+  --bg:#e9ecf1; --panel:#ffffff; --panel-2:#f3f5f8; --line:#d3d8e1; --fg:#161b24; --muted:#5a6475;
+  --accent:#2d5bd0; --accent-fg:#ffffff; --accent-soft:#e3eafb;
+  --ok:#17803d; --warn:#a35a00; --bad:#b4231b; --bad-soft:#fbe6e4; --warn-soft:#fbf0de;
+  --scr:#000000;
+  --f-ui:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#10141b; --panel:#181d26; --panel-2:#1f2531; --line:#2c3443; --fg:#e4e8ef; --muted:#97a1b3;
+  --accent:#7d9dff; --accent-fg:#0d1220; --accent-soft:#232d48;
+  --ok:#5fcf86; --warn:#f0b35a; --bad:#ff8a7e; --bad-soft:#3a1d1c; --warn-soft:#3a2e18; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#10141b; --panel:#181d26; --panel-2:#1f2531; --line:#2c3443; --fg:#e4e8ef; --muted:#97a1b3;
+  --accent:#7d9dff; --accent-fg:#0d1220; --accent-soft:#232d48;
+  --ok:#5fcf86; --warn:#f0b35a; --bad:#ff8a7e; --bad-soft:#3a1d1c; --warn-soft:#3a2e18; color-scheme:dark}
+*{box-sizing:border-box}
+html,body{background:var(--bg);color:var(--fg)}
+body{font:14px/1.45 var(--f-ui);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:14px 40px}
+h1,h2,h3,h4{margin:0;font-weight:600;text-wrap:balance}
+h1{font:600 17px/1.2 var(--f-mono);letter-spacing:.01em}
+h2{font-size:15px}
+h3{font-size:14px}
+h4{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}
+small{color:var(--muted);font-size:12px;line-height:1.4}
+button,.btn{font:500 13px var(--f-ui);color:var(--fg);background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:6px 11px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+button:hover,.btn:hover{border-color:var(--accent)}
+button:disabled{opacity:.45;cursor:default;border-color:var(--line)}
+button.primary,.btn.primary{background:var(--accent);color:var(--accent-fg);border-color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+input[type=number],select,textarea{font:13px var(--f-mono);color:var(--fg);background:var(--panel-2);border:1px solid var(--line);border-radius:5px;padding:4px 6px}
+input[type=number]{width:62px}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.between{justify-content:space-between}
+.col{display:flex;flex-direction:column;gap:8px;min-width:0}
+
+/* barre du haut */
+.top{display:flex;flex-wrap:wrap;gap:12px 20px;align-items:center;justify-content:space-between;margin-bottom:12px}
+.brand{display:flex;gap:12px;align-items:center;min-width:0}
+.mark{width:34px;height:34px;flex:none;border-radius:6px;background:var(--scr);display:grid;place-items:center}
+.mark canvas{width:24px;height:30px;image-rendering:pixelated}
+.brand p{margin:2px 0 0;font-size:12px;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{font:500 12px var(--f-mono);font-variant-numeric:tabular-nums;padding:4px 9px;border-radius:999px;border:1px solid var(--line);background:var(--panel)}
+.chip b{font-weight:600}
+.chip.over{border-color:var(--bad);background:var(--bad-soft);color:var(--bad)}
+.chip.near{border-color:var(--warn);background:var(--warn-soft)}
+.banner{border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:9px 12px;margin-bottom:12px;display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center}
+.banner.err{border-color:var(--bad);background:var(--bad-soft);color:var(--bad)}
+.banner.ex{border-style:dashed}
+.tag{font:600 11px var(--f-mono);letter-spacing:.06em;text-transform:uppercase;padding:2px 7px;border-radius:4px;background:var(--accent-soft);color:var(--accent)}
+.banner.err .tag{background:transparent;color:var(--bad);border:1px solid var(--bad)}
+#pastePanel{margin-bottom:12px}
+#pasteText{width:100%;height:160px;margin:8px 0}
+
+/* plan de travail */
+.work{display:grid;grid-template-columns:minmax(0,1fr) 410px;gap:14px;align-items:start}
+@media (max-width:1050px){.work{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px;min-width:0}
+.main{display:flex;flex-direction:column;gap:12px;min-width:0}
+.mapwrap{overflow-x:auto;margin-top:8px}
+#map{display:block;max-width:100%;cursor:pointer}
+.roombar{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between;margin-bottom:10px}
+.nav{display:flex;gap:4px}
+.nav button{padding:5px 8px;font-family:var(--f-mono)}
+.seg{display:inline-flex;flex-wrap:wrap;max-width:100%;border:1px solid var(--line);border-radius:7px;overflow:hidden;background:var(--panel-2);margin:0;padding:0}
+.seg legend{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.seg label{position:relative;padding:5px 10px;font-size:13px;cursor:pointer;border-right:1px solid var(--line);white-space:nowrap}
+.seg label:last-child{border-right:0}
+.seg input{position:absolute;opacity:0;pointer-events:none}
+.seg label:has(input:checked){background:var(--accent);color:var(--accent-fg)}
+.seg label:has(input:focus-visible){outline:2px solid var(--accent);outline-offset:-2px}
+.seg kbd{font:11px var(--f-mono);opacity:.7;margin-left:4px}
+.seg label:has(input:checked) kbd{background:transparent;color:inherit;border-color:currentColor}
+.seg.v{display:flex;flex-direction:column;width:100%}
+.seg.v label{white-space:normal;border-right:0;border-bottom:1px solid var(--line)}
+.seg.v label:last-child{border-bottom:0}
+.col>button{white-space:normal;text-align:left;justify-content:flex-start}
+@media (max-width:560px){.seg kbd{display:none}.seg label{padding:5px 8px}}
+.check{display:inline-flex;gap:6px;align-items:center;font-size:13px;cursor:pointer}
+.toolopts{min-height:30px;margin-bottom:8px;font-size:13px}
+.screen{background:var(--scr);border-radius:6px;padding:6px;overflow:hidden}
+#room{display:block;width:100%;height:auto;image-rendering:pixelated;touch-action:none}
+#room.t-select{cursor:pointer} #room.t-pen{cursor:crosshair} #room.t-block,#room.t-type{cursor:copy} #room.t-off{cursor:not-allowed}
+.status{font:12px var(--f-mono);color:var(--muted);min-height:18px;margin-top:6px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.insp{display:flex;flex-wrap:wrap;gap:10px 24px;margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}
+.insp .grp{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center}
+.insp .lbl{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.insp label{display:inline-flex;gap:5px;align-items:center;font-size:13px}
+.insp ul{margin:0;padding-left:18px;font-size:13px}
+.bad-input{border-color:var(--bad)!important}
+.libwrap{max-height:330px;overflow:auto;background:var(--scr);border-radius:6px;margin-top:8px}
+#lib,.chpal{display:block;cursor:pointer;image-rendering:pixelated}
+
+/* colonne de droite */
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--line);margin:-12px -12px 12px;padding:8px 8px 0;overflow-x:auto}
+.tabs button{border:0;border-bottom:2px solid transparent;border-radius:0;background:transparent;padding:7px 10px;color:var(--muted)}
+.tabs button[aria-selected=true]{color:var(--fg);border-bottom-color:var(--accent)}
+.edit2{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-start}
+.edit2 canvas{background:var(--scr);border-radius:4px;image-rendering:pixelated;touch-action:none;cursor:crosshair;max-width:100%}
+.ops{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.ops button{justify-content:center}
+.palwrap{background:var(--scr);border-radius:6px;max-height:260px;overflow:auto;margin-top:6px}
+.sl{display:flex;flex-direction:column;gap:3px;padding:10px 0;border-bottom:1px solid var(--line)}
+.sl label{display:flex;justify-content:space-between;gap:10px;font-weight:500}
+.sl output{font:600 13px var(--f-mono);color:var(--accent)}
+table{border-collapse:collapse;width:100%;font-size:13px;margin-top:10px}
+th,td{text-align:right;padding:5px 6px;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+th:first-child,td:first-child{text-align:left}
+th{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600}
+td.gain{color:var(--ok);font-weight:600}
+td.over{color:var(--bad);font-weight:600}
+.legend{display:flex;gap:14px;font-size:12px;color:var(--muted);margin-top:6px}
+.sw{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+#xText{width:100%;height:340px;margin-top:8px;font-size:12px;line-height:1.35;white-space:pre;overflow:auto}
+.msgs{display:flex;flex-direction:column;gap:4px;margin:8px 0;font-size:13px}
+.msg{padding:6px 9px;border-radius:6px;background:var(--panel-2)}
+.msg.bad{background:var(--bad-soft);color:var(--bad)}
+.msg.ok{color:var(--ok)}
+.msg.warn{background:var(--warn-soft);color:var(--fg);border-left:3px solid var(--warn)}
+.msg.warn ul{margin:6px 0 0;padding-left:18px}
+.msg.warn a{color:var(--accent)}
+.note{font-size:13px;background:var(--panel-2);border-radius:6px;padding:9px 11px;margin-top:10px}
+.note code{font:12px var(--f-mono)}
+.help{font-size:12px;color:var(--muted);margin-top:8px}
+kbd{font:11px var(--f-mono);border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:0 4px;background:var(--panel-2)}
+@media (prefers-reduced-motion:no-preference){button,.chip{transition:border-color .12s,background-color .12s}}
+</style>
+
+<header class="top">
+  <div class="brand">
+    <div class="mark"><canvas id="markCv" width="8" height="10"></canvas></div>
+    <div><h1>Atelier décor EXLPRINCE</h1><p id="srcline">niveau.txt : caractères 8×10, blocs de 4×6 caractères, salles de 10×3 cases</p></div>
+  </div>
+  <div class="row">
+    <label class="btn primary" for="file">Ouvrir niveau.txt</label>
+    <input type="file" id="file" accept=".txt,text/plain" hidden>
+    <button id="btnPaste">Coller un texte</button>
+    <button id="btnUndo" title="Annuler (Ctrl+Z)">↶ Annuler</button>
+    <button id="btnRedo" title="Rétablir (Ctrl+Y)">↷</button>
+  </div>
+  <div class="chips" id="chips"></div>
+</header>
+
+<div id="banner" class="banner"></div>
+
+<section id="pastePanel" class="panel" hidden>
+  <div class="row between"><h3>Coller le contenu de niveau.txt</h3><button id="pasteClose">Fermer</button></div>
+  <textarea id="pasteText" spellcheck="false" placeholder="depart 1 1 0&#10;car 1&#10;########&#10;…"></textarea>
+  <button class="primary" id="pasteGo">Charger ce texte</button>
+</section>
+
+<main class="work">
+  <div class="main">
+    <section class="panel">
+      <div class="row between"><h2>Plan du niveau</h2><small>Cliquez une salle pour l'ouvrir.</small></div>
+      <div class="mapwrap"><canvas id="map" width="10" height="10"></canvas></div>
+    </section>
+
+    <section class="panel">
+      <div class="roombar">
+        <div class="row">
+          <h2 id="roomTitle" class="mono">Salle –</h2>
+          <div class="nav" id="nav"></div>
+        </div>
+        <fieldset class="seg" id="tools">
+          <legend>Outil</legend>
+          <label><input type="radio" name="tool" value="select" checked>Choisir<kbd>S</kbd></label>
+          <label><input type="radio" name="tool" value="pen">Crayon<kbd>P</kbd></label>
+          <label><input type="radio" name="tool" value="block">Poser un bloc<kbd>B</kbd></label>
+          <label><input type="radio" name="tool" value="type">Type de case<kbd>T</kbd></label>
+        </fieldset>
+      </div>
+      <div class="row between toolopts">
+        <div id="toolOpts" class="row"></div>
+        <div class="row">
+          <label class="check"><input type="checkbox" id="optLogic" checked> Logique</label>
+          <label class="check"><input type="checkbox" id="optGrid"> Grille des caractères</label>
+        </div>
+      </div>
+      <div class="screen"><canvas id="room" width="1280" height="720" class="t-select"></canvas></div>
+      <div class="status" id="status">&nbsp;</div>
+      <div class="insp" id="insp"></div>
+    </section>
+
+    <section class="panel">
+      <div class="row between"><h2>Bibliothèque des blocs</h2><small id="libInfo"></small></div>
+      <div class="libwrap"><canvas id="lib" width="10" height="10"></canvas></div>
+    </section>
+  </div>
+
+  <aside class="panel" id="side">
+    <div class="tabs" role="tablist">
+      <button role="tab" data-tab="bloc" aria-selected="true">Bloc</button>
+      <button role="tab" data-tab="car" aria-selected="false">Caractères</button>
+      <button role="tab" data-tab="opt" aria-selected="false">Optimiser</button>
+      <button role="tab" data-tab="mur" aria-selected="false">Murs</button>
+      <button role="tab" data-tab="exp" aria-selected="false">Exporter</button>
+    </div>
+
+    <div class="tabpanel" id="tab-bloc">
+      <div class="row between"><h3 id="blkTitle" class="mono">Bloc –</h3><small id="blkUse"></small></div>
+      <div class="edit2" style="margin-top:10px">
+        <canvas id="blkCv" width="224" height="420"></canvas>
+        <div class="col" style="flex:1;min-width:140px">
+          <fieldset class="seg v">
+            <legend>Au clic</legend>
+            <label><input type="radio" name="bmode" value="draw" checked>Dessiner</label>
+            <label><input type="radio" name="bmode" value="put">Poser le caractère</label>
+            <label><input type="radio" name="bmode" value="pick">Pipette</label>
+          </fieldset>
+          <fieldset class="seg v" id="bscope">
+            <legend>Portée du crayon</legend>
+            <label><input type="radio" name="bscope" value="partout" checked>Partout où le caractère sert</label>
+            <label><input type="radio" name="bscope" value="bloc">Ce bloc seulement</label>
+          </fieldset>
+          <label class="chk"><input type="checkbox" id="shNum" checked> Numéros des caractères <small>(le caractère choisi en orange)</small></label>
+          <button id="blkPlace">Poser sur la case choisie</button>
+          <button id="blkDup">Dupliquer le bloc</button>
+          <button id="blkMir">Miroir ↔ (nouveau bloc)</button>
+          <button id="blkNew">Nouveau bloc vide</button>
+          <fieldset class="seg v" id="btnFs">
+            <legend>Bouton en relief (à partir de ce bloc de sol, vu en perspective comme lui)</legend>
+            <label>hauteur <input type="number" id="bpH" min="1" max="3" value="2" style="width:3.5em"> points</label>
+            <label>retrait <input type="number" id="bpI" min="0" max="10" value="3" style="width:3.5em"> points de chaque côté</label>
+            <label>pente <input type="number" id="bpS" min="0" max="4" value="2" style="width:3.5em"> points vers la gauche par ligne (la perspective du sol)</label>
+            <label><input type="checkbox" id="bpJ" checked> joint noir sous la plaque</label>
+            <button id="blkBtn">Fabriquer le bouton (nouveau bloc)</button>
+            <small>Une dalle surélevée sur le dessus du sol (5e rangée du bloc) : un parallélogramme dont les deux bords penchent comme ceux des dalles (la pente : vers la gauche en descendant). Posez le nouveau bloc sur les cases bouton ; l'image enfoncée (le sol nu) est faite par niveau2exl.py.</small>
+          </fieldset>
+        </div>
+      </div>
+      <div class="row between" style="margin-top:12px"><h4>Caractère à poser</h4><small id="putInfo"></small></div>
+      <div class="palwrap"><canvas class="chpal" id="chPalB" width="10" height="10"></canvas></div>
+    </div>
+
+    <div class="tabpanel" id="tab-car" hidden>
+      <div class="row between"><h3 id="chTitle" class="mono">Caractère –</h3><small id="chUse"></small></div>
+      <div class="edit2" style="margin-top:10px">
+        <canvas id="chCv" width="176" height="220"></canvas>
+        <div class="col" style="flex:1;min-width:150px">
+          <div class="ops">
+            <button data-op="inv">Inverser</button><button data-op="clr">Effacer</button>
+            <button data-op="mh">Miroir ↔</button><button data-op="mv">Miroir ↕</button>
+            <button data-op="l">Décaler ←</button><button data-op="r">Décaler →</button>
+            <button data-op="u">Décaler ↑</button><button data-op="d">Décaler ↓</button>
+          </div>
+          <button data-op="dup">Dupliquer</button>
+          <div class="row"><label class="check" for="chCol">Couleur</label><select id="chCol"><option value="7">blanc</option><option value="6">cyan</option><option value="5">magenta</option><option value="4">bleu</option><option value="3">jaune</option><option value="2">vert</option><option value="1">rouge</option><option value="0">noir</option></select></div>
+          <small>Partout où ce caractère est utilisé (7 caractères en couleur au plus). Là où passe le prince, la case prend sa couleur à lui : à réserver au décor qu'il ne traverse pas (flammes, haut des murs…). L'aperçu de la salle reste en blanc.</small>
+          <div class="row"><label class="check" for="chRepl">Remplacer partout par</label><input type="number" id="chRepl" min="0" value="0"><button id="chReplGo">OK</button></div>
+        </div>
+      </div>
+      <small style="display:block;margin-top:8px">Un point changé ici change le caractère dans tous les blocs qui l'utilisent.</small>
+      <div class="row between" style="margin-top:12px"><h4>Tous les caractères</h4>
+        <select id="chSort" aria-label="Ordre des caractères"><option value="num">par numéro</option><option value="usage">par usage</option></select></div>
+      <div class="palwrap"><canvas class="chpal" id="chPalC" width="10" height="10"></canvas></div>
+    </div>
+
+    <div class="tabpanel" id="tab-opt" hidden>
+      <small>Les réglages s'enchaînent de haut en bas. Tant que cet onglet est ouvert, la salle, le plan et la bibliothèque montrent le résultat ; rien n'est changé avant « Appliquer ».</small>
+      <div class="sl">
+        <label for="oSpeck">Taches isolées effacées <output id="oSpeckV">0</output></label>
+        <input type="range" id="oSpeck" min="0" max="6" value="0">
+        <small>Efface les taches de 1 à N points qui ne touchent aucun autre point du bloc, là où toutes les poses du caractère sont d'accord.</small>
+      </div>
+      <div class="sl">
+        <label for="oTolC">Tolérance entre caractères <output id="oTolCV">0</output></label>
+        <input type="range" id="oTolC" min="0" max="24" value="0">
+        <small>Deux caractères qui diffèrent d'au plus N points (sur 80) n'en font plus qu'un : celui qui se voit le moins prend l'image de l'autre.</small>
+      </div>
+      <div class="sl">
+        <label for="oCap">Caractères au plus <output id="oCapV">126</output></label>
+        <input type="range" id="oCap" min="8" max="126" value="126">
+        <small>Continue à fusionner, en commençant par ce qui coûte le moins de points à l'écran, jusqu'à ce nombre.</small>
+      </div>
+      <div class="sl">
+        <label for="oTolB">Tolérance entre blocs <output id="oTolBV">0</output></label>
+        <input type="range" id="oTolB" min="0" max="240" step="2" value="0">
+        <small>Deux blocs qui diffèrent d'au plus N points (sur 1920) n'en font plus qu'un. Les blocs des pics et de la porte de sortie ne bougent pas.</small>
+      </div>
+      <div class="row" style="margin-top:10px">
+        <fieldset class="seg"><legend>Voir</legend>
+          <label><input type="radio" name="prev" value="apres" checked>Après</label>
+          <label><input type="radio" name="prev" value="avant">Avant</label>
+          <label><input type="radio" name="prev" value="diff">Différences</label>
+        </fieldset>
+      </div>
+      <div class="legend" id="diffLegend" hidden><span><i class="sw" style="background:#4cc3ff"></i>point ajouté</span><span><i class="sw" style="background:#ff5a3c"></i>point effacé</span></div>
+      <table id="oTable"></table>
+      <p id="oNote" class="help"></p>
+      <div class="row" style="margin-top:8px"><button class="primary" id="oApply">Appliquer</button><button id="oReset">Remettre à zéro</button></div>
+    </div>
+
+    <div class="tabpanel" id="tab-mur" hidden>
+      <label class="check"><input type="checkbox" id="mOn"> Générer les murs, comme le jeu</label>
+      <div class="row" style="margin-top:6px;gap:14px"><label><input type="radio" name="mSty" value="1"> Pierres (façon Macintosh)</label><label><input type="radio" name="mSty" value="0"> Briques</label></div>
+      <div class="sl"><label for="inFl">Flamme animée : caractères <input type="text" id="inFl" style="width:9em" placeholder="aucune" spellcheck="false"></label><small>Les 4 caractères de la flamme des torches, en carré : haut gauche, haut droite, bas gauche, bas droite (par exemple 30 31 32 33). Le moteur y recopie à chaque pas une des 9 images de la flamme du jeu : ces 4 caractères ne doivent servir nulle part ailleurs (sinon, les dupliquer). Vide : flamme fixe.</small></div>
+      <div class="sl"><label for="inBu">Bulles de potion animées : caractère <input type="number" id="inBu" min="1" style="width:5em" placeholder="aucun"></label><small>Le caractère des bulles au-dessus des potions : le moteur y recopie tour à tour les 7 images des bulles du jeu, à 2 points de son bord gauche (tout le caractère : à ne pas employer ailleurs). Vide : bulles fixes.</small></div>
+      <div class="sl"><label for="inPl">Plafond mince : bloc <input type="number" id="inPl" min="1" style="width:5em" placeholder="aucun"></label><small>La ligne au-dessus de la salle montre le bas de la salle du dessus (10 lignes). Avec un bloc ici, chaque case non vide de cette ligne prend le caractère de sa colonne (0 à 3) dans la 6e rangée de ce bloc : par exemple un caractère avec un joint à gauche, puis 3 caractères de dalle, n'ayant que leurs lignes du bas dessinées. Vide : le bas des blocs, comme avant.</small></div>
+      <small style="display:block;margin-top:6px">Les cases <b>mur</b> n'utilisent plus leur bloc : le moteur pose des briques tirées au hasard, une graine par salle et par case (comme <code>wall_pattern</code> dans le jeu). Chaque rangée de briques a un joint (parmi 8) ; ailleurs, une brique pleine parmi 16. Les 48 caractères de briques vont dans le générateur BAGC1 : ils ne prennent rien aux 126 du décor.</small>
+      <div class="sl"><label for="mS">Graine <output id="mSV">0</output></label><input type="range" id="mS" min="0" max="255" value="7"><small>Change le tirage des joints et des points.</small></div>
+      <div class="sl"><label for="mD"><span id="mDL">Points noirs isolés</span> <output id="mDV">0</output></label><input type="range" id="mD" min="0" max="20" value="3"><small id="mDH">Au plus autant de taches au milieu des briques, par caractère (le nombre est tiré au hasard).</small></div>
+      <div class="sl"><label for="mE"><span id="mEL">Écornures</span> <output id="mEV">0</output></label><input type="range" id="mE" min="0" max="20" value="4"><small id="mEH">Au plus autant de briques ébréchées contre le mortier (1 à 3 points), par caractère.</small></div>
+      <div class="sl"><label for="mT">Joints épais <output id="mTV">0</output></label><input type="range" id="mT" min="0" max="100" step="5" value="50"><small>Part des joints de 2 points (les autres en font 1).</small></div>
+      <div class="row between" style="margin-top:12px"><h4>Les 48 caractères de briques</h4><small>8 joints (haut, bas), puis 16 pierres ou briques pleines (haut), 16 (bas) : dans le générateur BAGC1, hors des 126 du décor</small></div>
+      <div class="palwrap"><canvas class="chpal" id="mPal" width="10" height="10"></canvas></div>
+    </div>
+
+    <div class="tabpanel" id="tab-exp" hidden>
+      <label class="check"><input type="checkbox" id="xCompact" checked> Retirer les caractères et blocs inutilisés (les numéros sont refaits)</label>
+      <div class="msgs" id="xMsgs"></div>
+      <div class="row"><button class="primary" id="xCopy">Copier le texte</button><button id="xSel">Tout sélectionner</button><small id="xInfo"></small></div>
+      <textarea id="xText" readonly spellcheck="false" aria-label="Texte de niveau.txt"></textarea>
+      <div class="note">Collez ce texte dans <code>niveau.txt</code>, puis lancez l'étape 4 : <code>python3 niveau2exl.py niveau.txt</code>. Si elle propose un <code>--cram-debut</code> plus petit, refaites l'étape 3 avec cette valeur, puis la 4 et la 6 : la place gagnée dans l'Exelmémoire revient à la ROM.</div>
+    </div>
+  </aside>
+</main>
+
+<script>
+'use strict';
+// ---------- format de niveau.txt (comme niveau2exl.py) ----------
+const NOMS={0:'vide',1:'sol',2:'pics',3:'pilier',4:'grille',5:'bloque',6:'bouton_ferme',7:'linteau_sol',8:'gpilier_bas',9:'gpilier_haut',10:'potion',11:'fragile',12:'linteau',13:'miroir',14:'debris',15:'bouton_ouvre',16:'sortie_g',17:'sortie_d',18:'machoire',19:'torche',20:'mur',21:'squelette',22:'epee',23:'balcon_g',24:'balcon_d',30:'debris_torche',0xA4:'grille_ouverte',0x2A:'potion_vie',0x4A:'potion_grande',0x6A:'potion_poison'};
+const TYPES=Object.fromEntries(Object.entries(NOMS).map(([k,v])=>[v,+k]));
+const COURT={vide:'',sol:'sol',pics:'pics',pilier:'pilier',grille:'grille',bloque:'bloqué',bouton_ferme:'bout.ferme',linteau_sol:'lint.+sol',gpilier_bas:'gpil.bas',gpilier_haut:'gpil.haut',potion:'potion',fragile:'fragile',linteau:'linteau',miroir:'miroir',debris:'débris',bouton_ouvre:'bout.ouvre',sortie_g:'sortie G',sortie_d:'sortie D',machoire:'mâchoire',torche:'torche',mur:'mur',squelette:'squelette',epee:'épée',balcon_g:'balcon G',balcon_d:'balcon D',debris_torche:'déb.torche',grille_ouverte:'grille ouv',potion_vie:'pot.vie',potion_grande:'pot.grande',potion_poison:'poison'};
+const KIND=t=>{const n=NOMS[t]||'';if(/^(pics|fragile|machoire)$/.test(n))return 'd';if(/grille|bouton|sortie/.test(n))return 'm';if(/potion|epee/.test(n))return 'i';return 'n';};
+const MAXT=126,MAXB=255,MAXR=512;
+const SCR={bg:'#000000',fg:'#ece8dc',dim:'#5d5a52',grid:'rgba(120,150,255,.30)',grid2:'rgba(120,150,255,.13)',sel:'#ffb020',add:'#4cc3ff',del:'#ff5a3c',lab:'#9aa3b5',
+  kind:{d:'#ff7a5c',m:'#6fc6ff',i:'#ffd84a',n:'#d8d4c8'}};
+const HEADER=`# niveau.txt -- un niveau de prince_jeu, en clair.
+#   python3 niveau2exl.py niveau.txt        -> prince_niveau.cram et niveau.png
+#
+# depart SALLE ETAGE CASE      (etage 0 en haut ; case 0 a gauche)
+# car N    : un caractere, 10 lignes de 8 points (# allume, . eteint). 126 au plus.
+# bloc N   : une case du jeu, 6 lignes de 4 numeros de caractere (0 = vide). 255 au plus.
+#            La 6e ligne est celle du sol : le personnage marche sur son bord haut.
+# salle N voisines G D H B     (numeros des salles voisines, 0 = aucune), puis
+#   3 lignes de 10 numeros de bloc : l'IMAGE de la salle, etage par etage ;
+#   3 lignes de 10 types de case   : la LOGIQUE (le moteur ne regarde que ca).
+# bouton SALLE ETAGE CASE -> SALLE ETAGE CASE ; pics BLOC -> BLOC ; garde ... ; porte ... ; entree bouton ...
+# Les numeros doivent se suivre a partir de 1. Tout ce qui suit un # est un commentaire.`.split('\n');
+
+const Z10=()=>[0,0,0,0,0,0,0,0,0,0], Z24=()=>new Array(24).fill(0);
+function parse(text){
+  const raw=text.replace(/\r/g,'').split('\n');
+  const pts=l=>/^[#.]{8}$/.test(l.trim());
+  const L=raw.map(l=>pts(l)?l.trim():l.split('#')[0].trimEnd());
+  const header=[];
+  for(const l of raw){ if(/^\s*#/.test(l)&&!pts(l))header.push(l.trimEnd()); else if(l.trim()===''){ if(header.length)header.push(''); } else break; }
+  while(header.length&&header[header.length-1]==='')header.pop();
+  const m={header,depart:null,chars:[Z10()],blocks:[Z24()],rooms:new Map(),liens:[],pics:[],gardes:[],portes:[],entree:null,fraga:[],tombe:[],enfonce:[],couleurs:[]};
+  let i=0;const err=s=>{throw new Error(`ligne ${i+1} : ${s}`)};
+  const next=()=>{i++;while(i<L.length&&L[i].trim()==='')i++;if(i>=L.length)err('fin de fichier inattendue');return L[i];};
+  const nums=(l,n,maxi,q)=>{const p=l.trim().split(/\s+/);if(p.some(x=>!/^\d+$/.test(x)))err(`attendu : ${n} numéros de ${q}`);if(p.length!==n)err(`attendu : ${n} numéros de ${q}, trouvé ${p.length}`);const v=p.map(Number);for(const x of v)if(x>maxi)err(`${q} ${x} inconnu (de 0 à ${maxi})`);return v;};
+  const int=s=>/^\d+$/.test(s)?+s:NaN;
+  const later=[];
+  while(i<L.length){
+    const w=L[i].trim().split(/\s+/).filter(Boolean);
+    if(!w.length){i++;continue;}
+    const k=w[0];
+    if(k==='depart'&&w.length===4){m.depart=w.slice(1).map(int);i++;}
+    else if(k==='car'){
+      if(w.length!==2||int(w[1])!==m.chars.length)err(`attendu : car ${m.chars.length}`);
+      const rows=[];for(let r=0;r<10;r++){const s=next().trim();if(!/^[#.]{8}$/.test(s))err('un caractère a 10 lignes de 8 points # ou .');let v=0;for(let x=0;x<8;x++)if(s[x]==='#')v|=0x80>>x;rows.push(v);}
+      m.chars.push(rows);i++;
+    }else if(k==='bloc'){
+      if(w.length!==2||int(w[1])!==m.blocks.length)err(`attendu : bloc ${m.blocks.length}`);
+      const b=[];const at=i;for(let r=0;r<6;r++)b.push(...nums(next(),4,252,'caractère'));later.push([at,'bloc',b]);m.blocks.push(b);i++;
+    }else if(k==='salle'){
+      if(w.length!==7||w[2]!=='voisines')err('attendu : salle N voisines G D H B');
+      const r=int(w[1]),vo=w.slice(3).map(int);
+      if(!(r>=1&&r<=24)||m.rooms.has(r))err('numéro de salle de 1 à 24, une seule fois');
+      if(vo.some(isNaN))err('attendu : salle N voisines G D H B');
+      const at=i;const bl=[];for(let e=0;e<3;e++)bl.push(...nums(next(),10,255,'bloc'));
+      const ty=[];for(let e=0;e<3;e++){const ws=next().trim().split(/\s+/);if(ws.length!==10)err('attendu : 10 types de case');for(const x of ws){if(x in TYPES)ty.push(TYPES[x]);else if(/^\d+$/.test(x)&&+x<256)ty.push(+x);else err('type de case inconnu : '+x);}}
+      later.push([at,'salle',bl]);m.rooms.set(r,{bl,ty,vo});i++;
+    }else if(k==='bouton'){
+      const v=[...w.slice(1,4),...w.slice(5,8)].map(int);
+      if(w.length!==8||w[4]!=='->'||v.some(isNaN))err('attendu : bouton SALLE ETAGE CASE -> SALLE ETAGE CASE');
+      m.liens.push(v);i++;
+    }else if(k==='pics'){
+      if(w.length!==4||w[2]!=='->'||isNaN(int(w[1]))||isNaN(int(w[3])))err('attendu : pics BLOC -> BLOC');
+      later.push([i,'pics',[int(w[1]),int(w[3])]]);m.pics.push([int(w[1]),int(w[3])]);i++;
+    }else if(k==='garde'){
+      const g=[int(w[1]),int(w[2]),int(w[3]),w[4]==='gauche',int(w[5]),int(w[6])];
+      if(w.length!==7||!(w[4]==='gauche'||w[4]==='droite')||[g[0],g[1],g[2],g[4],g[5]].some(isNaN))err('attendu : garde SALLE ETAGE CASE gauche|droite NIVEAU PV');
+      m.gardes.push(g);i++;
+    }else if(k==='porte'){
+      const v=[...w.slice(1,4),...w.slice(5,7)].map(int);
+      if(w.length!==7||w[4]!=='ouverte'||v.some(isNaN))err('attendu : porte SALLE ETAGE CASE ouverte BLOC BLOC');
+      later.push([i,'porte',v]);m.portes.push(v);i++;
+    }else if(k==='entree'){
+      const v=w.slice(2,5).map(int);
+      if(w.length!==5||w[1]!=='bouton'||v.some(isNaN))err('attendu : entree bouton SALLE ETAGE CASE');
+      m.entree=v;i++;
+    }else if(k==='murs'){
+      if(w[1]==='pierres'){const v=w.slice(2).map(int);
+        if(w.length!==6||v.some(isNaN)||v[0]>255||v[1]>100||v[2]>100||v[3]<1||v[3]>4)err('attendu : murs pierres GRAINE(0-255) FISSURES(0-100) EPAIS(0-100) OMBRE(1-4)');
+        m.murs=[...v,1];i++;}else{
+      const v=w.slice(1).map(int);
+      if((w.length!==4&&w.length!==5)||v.some(isNaN)||v[0]>255||v[1]>20||v[2]>100||(v.length>3&&v[3]>20))err('attendu : murs GRAINE(0-255) POINTS(0-20) EPAIS(0-100) [ECLATS(0-20)]');
+      if(v.length===3)v.push(4);m.murs=v;i++;}
+    }else if(k==='enfonce'){
+      const v=w.slice(1).map(int);if((w.length!==5&&w.length!==6)||v.some(isNaN))err('attendu : enfonce SALLE ETAGE CASE BLOC [BLOC_DE_LA_VOISINE]');
+      if(v.length===4)v.push(null);later.push([i,'enfonce',v]);m.enfonce.push(v);i++;
+    }else if(k==='bulle'){
+      const v=int(w[1]);if(w.length!==2||isNaN(v))err('attendu : bulle CARACTERE');later.push([i,'bulle',[v]]);m.bulle=v;i++;
+    }else if(k==='flamme'){
+      const v=w.slice(1).map(int);if(w.length!==5||v.some(isNaN))err('attendu : flamme HAUT_GAUCHE HAUT_DROITE BAS_GAUCHE BAS_DROITE');later.push([i,'flamme',v]);m.flamme=v;i++;
+    }else if(k==='couleur'){
+      const c=int(w[1]),n=NOMSC.indexOf(w[2]),col=n>=0?n:int(w[2]);if(w.length!==3||isNaN(c)||!(col>=0&&col<8))err('attendu : couleur CARACTERE COULEUR ('+NOMSC.join(' ')+')');
+      later.push([i,'couleur',[c,col]]);m.couleurs=(m.couleurs||[]).filter(v=>v[0]!==c);m.couleurs.push([c,col]);i++;
+    }else if(k==='plafond'){
+      const v=int(w[1]);if(w.length!==2||isNaN(v))err('attendu : plafond BLOC');later.push([i,'plafond',[v]]);m.plafond=v;i++;
+    }else if(k==='debris'){
+      const v=int(w[1]);if(w.length!==2||isNaN(v))err('attendu : debris BLOC');later.push([i,'debris',[v]]);m.debris=v;i++;
+    }else if(k==='tombe'){
+      const v=w.slice(1).map(int);if(w.length!==5||v.some(isNaN))err('attendu : tombe SALLE ETAGE CASE BLOC');
+      later.push([i,'tombe',v]);m.tombe.push(v);i++;
+    }else if(k==='fragile'){
+      if((w.length!==5&&w.length!==6)||w[2]!=='->'||[1,3,4].some(q=>isNaN(int(w[q]))))err('attendu : fragile BLOC -> BLOC BLOC [TEMPO]');
+      if(w.length===6){const tp=int(w[5]);if(!(tp>=1&&tp<=8))err('fragile : TEMPO de 1 à 8 (pas par image)');m.ftempo=tp;}
+      const v=[int(w[1]),int(w[3]),int(w[4])];if(m.fraga.some(q=>q[0]===v[0]))err(`fragile : le bloc ${v[0]} a déjà son animation`);
+      if(m.fraga.length>=14)err('fragile : 14 animations au plus');
+      later.push([i,'fragile',v]);m.fraga.push(v);i++;
+    }else err('attendu : depart, car, bloc, salle, bouton, pics, garde, porte, entree, murs, fragile tombe, debris, plafond, couleur, flamme, bulle ou enfonce');
+  }
+  for(const [at,q,v] of later){
+    i=at;
+    if(q==='bloc'&&Math.max(...v)>=m.chars.length)err(`ce bloc utilise le caractère ${Math.max(...v)}, qui n'existe pas`);
+    if(q==='salle'&&Math.max(...v)>=m.blocks.length)err(`cette salle utilise le bloc ${Math.max(...v)}, qui n'existe pas`);
+    if(q==='fragile'&&v.some(b=>b<1||b>=m.blocks.length))err('fragile : bloc inexistant');
+    if(q==='enfonce'){const R=m.rooms.get(v[0]);if(!R||v[1]>2||v[2]>9||![6,15].includes(R.ty[v[1]*10+v[2]]&0x1F))err(`enfonce : la case ${v.slice(0,3).join(' ')} n'est pas un bouton`);if(v.slice(3).some(b=>b!=null&&b>=m.blocks.length))err('enfonce : bloc inexistant');}
+    if(q==='debris'&&!(v[0]>=1&&v[0]<m.blocks.length))err('debris : bloc inexistant');
+    if(q==='plafond'&&!(v[0]>=1&&v[0]<m.blocks.length))err('plafond : bloc inexistant');
+    if(q==='couleur'&&!(v[0]>=1&&v[0]<m.chars.length))err('couleur : caractère inexistant');
+    if(q==='flamme'&&!v.every(c=>c>=1&&c<m.chars.length))err('flamme : caractère inexistant');
+    if(q==='bulle'&&!(v[0]>=1&&v[0]<m.chars.length))err('bulle : caractère inexistant');
+    if(q==='tombe'){const R=m.rooms.get(v[0]);if(!R||v[1]>2||v[2]>9||(R.ty[v[1]*10+v[2]]&0x1F)!==11)err(`tombe : la case ${v.slice(0,3).join(' ')} n'est pas un sol fragile`);if(v[3]>=m.blocks.length)err('tombe : bloc inexistant');}
+    if((q==='pics'||q==='porte')&&v.slice(q==='porte'?3:0).some(b=>b<1||b>=m.blocks.length))err(`${q} : bloc inexistant`);
+  }
+  if(!m.rooms.size){i=L.length-1;err('aucune salle');}
+  if(!m.depart)m.depart=[Math.min(...m.rooms.keys()),1,0];
+  return m;
+}
+const p3=n=>String(n).padStart(3,' ');
+function serialize(m0,compact){
+  const m=compact?compactModel(m0):m0;
+  const use={};for(const r of m.rooms.values())r.bl.forEach((b,i)=>{(use[b]??={});use[b][r.ty[i]]=(use[b][r.ty[i]]||0)+1;});
+  const o=[];
+  o.push(...(m.header.length?m.header:HEADER),'');
+  o.push(`depart ${m.depart.join(' ')}`,'');
+  for(let c=1;c<m.chars.length;c++){o.push('car '+c);for(const v of m.chars[c]){let s='';for(let x=0;x<8;x++)s+=(v&(0x80>>x))?'#':'.';o.push(s);}o.push('');}
+  for(let b=1;b<m.blocks.length;b++){
+    const u=use[b];let com='   # inutilise';
+    if(u){const t=Object.keys(u).reduce((a,k)=>u[k]>u[a]?k:a);com=`   # surtout : ${NOMS[t]??'?'} (${Object.values(u).reduce((a,x)=>a+x,0)} fois en tout)`;}
+    o.push(`bloc ${b}${com}`);for(let y=0;y<6;y++)o.push(m.blocks[b].slice(y*4,y*4+4).map(p3).join(' '));o.push('');
+  }
+  for(const r of [...m.rooms.keys()].sort((a,b)=>a-b)){
+    const R=m.rooms.get(r);o.push(`salle ${r} voisines ${R.vo.join(' ')}`);
+    for(let e=0;e<3;e++)o.push(R.bl.slice(e*10,e*10+10).map(p3).join(' '));
+    for(let e=0;e<3;e++)o.push(R.ty.slice(e*10,e*10+10).map(t=>NOMS[t]??String(t)).join(' '));
+    o.push('');
+  }
+  for(const v of m.liens)o.push(`bouton ${v[0]} ${v[1]} ${v[2]} -> ${v[3]} ${v[4]} ${v[5]}`);
+  for(const v of m.pics)o.push(`pics ${v[0]} -> ${v[1]}`);
+  for(const v of (m.fraga||[]))o.push(`fragile ${v[0]} -> ${v[1]} ${v[2]} ${m.ftempo||2}`);
+  if(m.debris!=null)o.push(`debris ${m.debris}`);
+  if(m.plafond!=null)o.push(`plafond ${m.plafond}`);
+  for(const v of [...(m.couleurs||[])].sort((a,b)=>a[0]-b[0]))o.push(`couleur ${v[0]} ${NOMSC[v[1]]}`);
+  if(m.flamme)o.push(`flamme ${m.flamme.join(' ')}`);
+  if(m.bulle)o.push(`bulle ${m.bulle}`);
+  for(const v of (m.enfonce||[])){const R=m.rooms.get(v[0]);if(R&&[6,15].includes(R.ty[v[1]*10+v[2]]&0x1F))o.push(`enfonce ${v[0]} ${v[1]} ${v[2]} ${v[3]}${v[4]!=null?' '+v[4]:''}`);}
+  for(const v of (m.tombe||[])){const R=m.rooms.get(v[0]);if(R&&(R.ty[v[1]*10+v[2]]&0x1F)===11)o.push(`tombe ${v.join(' ')}`);}
+  for(const g of m.gardes)o.push(`garde ${g[0]} ${g[1]} ${g[2]} ${g[3]?'gauche':'droite'} ${g[4]} ${g[5]}`);
+  for(const v of m.portes)o.push(`porte ${v[0]} ${v[1]} ${v[2]} ouverte ${v[3]} ${v[4]}`);
+  if(m.entree)o.push(`entree bouton ${m.entree.join(' ')}`);
+  if(m.murs)o.push(m.murs[4]===1?`murs pierres ${m.murs.slice(0,4).join(' ')}`:`murs ${m.murs.slice(0,4).join(' ')}`);
+  return o.join('\n')+'\n';
+}
+
+// ---------- modèle ----------
+function cloneModel(m){return{header:m.header.slice(),depart:m.depart.slice(),chars:m.chars.map(c=>c.slice()),blocks:m.blocks.map(b=>b.slice()),
+  rooms:new Map([...m.rooms].map(([k,r])=>[k,{bl:r.bl.slice(),ty:r.ty.slice(),vo:r.vo.slice()}])),
+  liens:m.liens.map(x=>x.slice()),pics:m.pics.map(x=>x.slice()),gardes:m.gardes.map(x=>x.slice()),portes:m.portes.map(x=>x.slice()),entree:m.entree?m.entree.slice():null,murs:m.murs?m.murs.slice():null,fraga:(m.fraga||[]).map(x=>x.slice()),ftempo:m.ftempo||2,tombe:(m.tombe||[]).map(x=>x.slice()),debris:m.debris??null,plafond:m.plafond??null,enfonce:(m.enfonce||[]).map(x=>x.slice()),couleurs:(m.couleurs||[]).map(x=>x.slice()),flamme:m.flamme?m.flamme.slice():null,bulle:m.bulle??null};}
+function protSet(m){const s=new Set();for(const [a,b] of m.pics){s.add(a);s.add(b);}for(const p of m.portes){s.add(p[3]);s.add(p[4]);}for(const v of (m.fraga||[]))for(const b of v)s.add(b);for(const v of (m.tombe||[]))if(v[3])s.add(v[3]);if(m.debris)s.add(m.debris);if(m.plafond)s.add(m.plafond);for(const v of (m.enfonce||[])){if(v[3])s.add(v[3]);if(v[4])s.add(v[4]);}return s;}
+function usage(m){
+  const bu=new Int32Array(m.blocks.length);for(const r of m.rooms.values())r.bl.forEach((b,i)=>{if(b<bu.length&&!(m.murs&&(r.ty[i]&0x1F)===20))bu[b]++;});
+  const prot=protSet(m),n=m.chars.length;const cu=new Float64Array(n),cref=new Int32Array(n),cblk=new Int32Array(n);
+  for(let b=1;b<m.blocks.length;b++){const w=bu[b]||(prot.has(b)?1:0);const seen=new Set();for(const c of m.blocks[b]){if(!c||c>=n)continue;cref[c]++;cu[c]+=w;seen.add(c);}for(const c of seen)cblk[c]++;}
+  return{bu,cu,cref,cblk,prot};
+}
+function compactModel(src){
+  const m=cloneModel(src);if(m.murs)for(const r of m.rooms.values())r.ty.forEach((t,i)=>{if((t&0x1F)===20)r.bl[i]=0;});const used=new Set([0]);for(const r of m.rooms.values())r.bl.forEach(b=>used.add(b));for(const b of protSet(m))used.add(b);
+  const bmap=new Int32Array(m.blocks.length);const nb=[Z24()];for(let b=1;b<m.blocks.length;b++)if(used.has(b)){bmap[b]=nb.length;nb.push(m.blocks[b]);}
+  const cused=new Set([0]);for(const b of nb)b.forEach(c=>cused.add(c));
+  const cmap=new Int32Array(m.chars.length);const nc=[Z10()];for(let c=1;c<m.chars.length;c++)if(cused.has(c)){cmap[c]=nc.length;nc.push(m.chars[c]);}
+  m.couleurs=(m.couleurs||[]).filter(v=>cmap[v[0]]).map(v=>[cmap[v[0]],v[1]]);
+  if(m.flamme)m.flamme=m.flamme.every(c=>cmap[c])?m.flamme.map(c=>cmap[c]):null;
+  if(m.bulle)m.bulle=cmap[m.bulle]||null;
+  for(const b of nb)for(let k=0;k<24;k++)b[k]=cmap[b[k]];
+  for(const r of m.rooms.values())r.bl=r.bl.map(b=>bmap[b]);
+  m.pics=m.pics.map(([a,b])=>[bmap[a],bmap[b]]);m.portes=m.portes.map(p=>[p[0],p[1],p[2],bmap[p[3]],bmap[p[4]]]);m.fraga=(m.fraga||[]).map(v=>v.map(b=>bmap[b]));m.tombe=(m.tombe||[]).map(v=>[v[0],v[1],v[2],bmap[v[3]]]);if(m.debris!=null)m.debris=bmap[m.debris];if(m.plafond!=null)m.plafond=bmap[m.plafond];m.enfonce=(m.enfonce||[]).map(v=>[v[0],v[1],v[2],bmap[v[3]],v[4]!=null?bmap[v[4]]:null]);
+  m.blocks=nb;m.chars=nc;return m;
+}
+function stats(m){
+  const rows=new Set(['0,0,0,0']);for(let b=1;b<m.blocks.length;b++){const bl=m.blocks[b];for(let y=0;y<6;y++)rows.add(bl.slice(y*4,y*4+4).join(','));}
+  let gates=0;for(const r of m.rooms.values())for(const t of r.ty)if((t&0x1F)===4)gates++;
+  const nb=m.blocks.length-1,G=5*gates+8*m.portes.length,nc=m.chars.length-1;   // (les briques des murs generes sont dans BAGC1 : elles ne comptent pas)
+  const size=2896+7*(nb+1+G)+4*(rows.size+Math.round(G*0.4))+(m.murs?480:0);
+  return{nc,nb,nr:rows.size,size};
+}
+const pc8=x=>{x=x-((x>>1)&0x55);x=(x&0x33)+((x>>2)&0x33);return(x+(x>>4))&0x0f;};
+const pc32=x=>{x=x-((x>>>1)&0x55555555);x=(x&0x33333333)+((x>>>2)&0x33333333);return(((x+(x>>>4))&0x0F0F0F0F)*0x01010101)>>>24;};
+function blockWords(m,b){const w=new Uint32Array(60);const bl=m.blocks[b];for(let y=0;y<60;y++){const cy=(y/10|0)*4,ry=y%10;let v=0;for(let cx=0;cx<4;cx++){const c=bl[cy+cx];v=(v<<8)|(c?m.chars[c][ry]:0);}w[y]=v>>>0;}return w;}
+
+// ---------- optimisation ----------
+function despeck(m,k){
+  const U=usage(m),n=m.chars.length;const small=Array.from({length:n},()=>new Uint16Array(80)),place=new Uint16Array(n);
+  const img=new Uint8Array(1920),flag=new Uint8Array(1920),seen=new Uint8Array(1920);const st=[],comp=[];
+  for(let b=1;b<m.blocks.length;b++){
+    if(!U.bu[b]&&!U.prot.has(b))continue;const bl=m.blocks[b];
+    for(let y=0;y<60;y++)for(let x=0;x<32;x++){const c=bl[(y/10|0)*4+(x>>3)];img[y*32+x]=c?(m.chars[c][y%10]>>(7-(x&7)))&1:0;}
+    flag.fill(0);seen.fill(0);
+    for(let p=0;p<1920;p++){if(!img[p]||seen[p])continue;comp.length=0;st.length=0;st.push(p);seen[p]=1;
+      while(st.length){const q=st.pop();comp.push(q);if(comp.length>k+1)continue;const qx=q&31,qy=q>>5;
+        for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){const x=qx+dx,y=qy+dy;if(x<0||x>31||y<0||y>59)continue;const r=y*32+x;if(img[r]&&!seen[r]){seen[r]=1;st.push(r);}}}
+      if(comp.length<=k)for(const q of comp)flag[q]=1;}
+    for(let cell=0;cell<24;cell++){const c=bl[cell];if(!c)continue;place[c]++;const ox=(cell&3)*8,oy=(cell>>2)*10;
+      for(let y=0;y<10;y++)for(let x=0;x<8;x++)if(flag[(oy+y)*32+ox+x])small[c][y*8+x]++;}
+  }
+  let removed=0;
+  for(let c=1;c<n;c++){if(!place[c])continue;for(let p=0;p<80;p++)if(small[c][p]&&small[c][p]===place[c]){m.chars[c][p>>3]&=~(0x80>>(p&7));removed++;}}
+  return removed;
+}
+function greedy(ids,W,dist,tol,cap,canSrc){
+  const k=ids.length,alive=new Uint8Array(k).fill(1),into=new Int32Array(k).fill(-1);let count=k-1,merged=0,phase=0;
+  for(;;){
+    if(phase===1&&count<=cap)break;const forced=phase===1;let bi=-1,bj=-1,bc=Infinity,bd=1e9;
+    for(let i=1;i<k;i++){if(!alive[i]||!canSrc(i))continue;const wi=W[i],ci=wi>0?wi:0.01;
+      for(let j=0;j<k;j++){if(j===i||!alive[j])continue;if(j&&(W[j]<wi||(W[j]===wi&&j>i&&canSrc(j))))continue;
+        const d=dist[i*k+j];if(!forced&&d>tol)continue;const cost=ci*d;
+        if(cost<bc||(cost===bc&&d<bd)){bc=cost;bd=d;bi=i;bj=j;}}}
+    if(bi<0){if(phase===0&&count>cap){phase=1;continue;}break;}into[bi]=bj;alive[bi]=0;if(bj)W[bj]+=W[bi];count--;merged++;
+  }
+  const fin=i=>{while(into[i]>=0)i=into[i];return i;};
+  return{map:ids.map((_,i)=>ids[fin(i)]),merged};
+}
+function optimize(src,p){
+  const R={pixels:0,chars:0,blocks:0};let m=compactModel(src);
+  if(p.speck>0)R.pixels=despeck(m,p.speck);
+  { // caractères
+    const n=m.chars.length,rep=[...Array(n).keys()],key=new Map();
+    const CO=new Map((m.couleurs||[]).map(v=>[v[0],v[1]]));(m.flamme||[]).forEach((c,k)=>CO.set(c,100+k));if(m.bulle)CO.set(m.bulle,200);const co=c=>CO.has(c)?CO.get(c):7;
+    for(let c=1;c<n;c++){const ch=m.chars[c];if(ch.every(v=>!v)&&!CO.has(c)){rep[c]=0;continue;}const s=co(c)+'|'+ch.join(',');if(key.has(s))rep[c]=key.get(s);else key.set(s,c);}
+    const U=usage(m),w=new Float64Array(n);for(let c=1;c<n;c++)w[rep[c]]+=U.cu[c];
+    const ids=[0];for(let c=1;c<n;c++)if(rep[c]===c)ids.push(c);
+    const k=ids.length,D=new Uint16Array(k*k);
+    for(let i=0;i<k;i++)for(let j=i+1;j<k;j++){const a=m.chars[ids[i]],b=m.chars[ids[j]];let d=0;for(let y=0;y<10;y++)d+=pc8(a[y]^b[y]);D[i*k+j]=D[j*k+i]=(ids[i]&&ids[j]&&co(ids[i])!==co(ids[j]))?65535:d;}
+    const W=ids.map(c=>c?w[c]:Infinity);
+    const g=greedy(ids,W,D,p.tolC,p.capC,()=>true);R.chars=g.merged;
+    const fin=new Map(ids.map((c,i)=>[c,g.map[i]]));
+    for(const b of m.blocks)for(let q=0;q<24;q++)b[q]=fin.get(rep[b[q]]);
+  }
+  { // blocs
+    const n=m.blocks.length,U=usage(m),prot=U.prot,rep=[...Array(n).keys()],key=new Map();
+    for(let b=1;b<n;b++){if(prot.has(b)){const s=m.blocks[b].join(',');if(!key.has(s))key.set(s,b);continue;}
+      if(m.blocks[b].every(v=>!v)){rep[b]=0;continue;}const s=m.blocks[b].join(',');if(key.has(s))rep[b]=key.get(s);else key.set(s,b);}
+    if(p.tolB>0){
+      const ids=[0];for(let b=1;b<n;b++)if(rep[b]===b)ids.push(b);
+      const k=ids.length,words=ids.map(b=>blockWords(m,b)),D=new Uint16Array(k*k);
+      for(let i=0;i<k;i++)for(let j=i+1;j<k;j++){const a=words[i],c=words[j];let d=0;for(let y=0;y<60;y++)d+=pc32(a[y]^c[y]);D[i*k+j]=D[j*k+i]=d;}
+      const w=new Float64Array(n);for(let b=1;b<n;b++)w[rep[b]]+=U.bu[b];
+      const W=ids.map(b=>b?w[b]:Infinity);
+      const g=greedy(ids,W,D,p.tolB,1e9,i=>!prot.has(ids[i]));R.blocks=g.merged;
+      const fin=new Map(ids.map((b,i)=>[b,g.map[i]]));for(let b=1;b<n;b++)rep[b]=fin.get(rep[b]);
+    }
+    for(const r of m.rooms.values())r.bl=r.bl.map(b=>rep[b]);
+  }
+  return{m:compactModel(m),R};
+}
+
+// ---------- validation ----------
+function validate(m){
+  const out=[],st=stats(m),ty=(r,e,c)=>{const R=m.rooms.get(r);return R&&e>=0&&e<3&&c>=0&&c<10?R.ty[e*10+c]:null;};
+  if(st.nc>MAXT)out.push(`${st.nc} caractères : ${MAXT} au plus. Réduisez-les dans « Optimiser ».`);
+  if((m.couleurs||[]).length>7)out.push(`${m.couleurs.length} caractères en couleur : 7 au plus.`);
+  if(st.nb>MAXB)out.push(`${st.nb} blocs : ${MAXB} au plus (et la compilation en ajoute pour les grilles).`);
+  if(st.nr>MAXR)out.push(`${st.nr} rangées de 4 caractères différentes : ${MAXR} au plus.`);
+  const [dr,de,dc]=m.depart;if(ty(dr,de,dc)===null)out.push(`départ ${dr} ${de} ${dc} : cette case n'existe pas.`);
+  for(const [r,R] of m.rooms)R.vo.forEach(n=>{if(n&&!m.rooms.has(n))out.push(`la salle ${r} a pour voisine la salle ${n}, qui n'existe pas.`);});
+  for(const v of m.liens){const a=ty(v[0],v[1],v[2]),b=ty(v[3],v[4],v[5]);
+    if(a===null||![6,15].includes(a&0x1F))out.push(`bouton ${v.slice(0,3).join(' ')} : la case n'est plus un bouton.`);
+    if(b===null||!(b===0xA4||[4,16].includes(b&0x1F)))out.push(`bouton → ${v.slice(3).join(' ')} : la case n'est plus une grille ni une sortie_g.`);}
+  for(const p of m.portes){const t=ty(p[0],p[1],p[2]);if(t===null||(t&0x1F)!==16)out.push(`porte ${p.slice(0,3).join(' ')} : attendu une case sortie_g.`);}
+  if(m.entree){const t=ty(...m.entree);if(t===null||![6,15].includes(t&0x1F))out.push(`entrée ${m.entree.join(' ')} : la case n'est pas un bouton.`);}
+  for(const g of m.gardes)if(!m.rooms.has(g[0]))out.push(`garde de la salle ${g[0]} : salle inexistante.`);
+  return out;
+}
+
+// ---------- image et logique en désaccord ----------
+// colonnes de points allumées dans le bas du bloc (lignes 40 à 59 : là où est dessinée la dalle)
+function floorCols(m,b){const w=blockWords(m,b);let o=0;for(let y=40;y<60;y++)o|=w[y];return pc32(o>>>0);}
+const HOLE=t=>[0,9,12].includes(t&0x1F),WALLT=t=>(t&0x1F)===20;
+function mismatches(m){const out=[],cache=new Map(),fc=b=>{if(!cache.has(b))cache.set(b,floorCols(m,b));return cache.get(b);};
+  for(const [r,R] of m.rooms)for(let i=0;i<30;i++){const t=R.ty[i];if(WALLT(t))continue;const n=fc(R.bl[i]);
+    if(HOLE(t)){if(n>=30)out.push({r,i,k:'trou'});}else if(n<28)out.push({r,i,k:'sol'});}
+  return out;}
+const MISTXT={sol:'type de sol, mais l\'image n\'a pas de dalle sur toute la largeur : le prince y tiendra en l\'air',
+  trou:'type vide, mais l\'image montre une dalle entière : le prince tombera à travers'};
+
+// ---------- exemple (dessiné ici, sans rien du jeu) ----------
+function mulberry(a){return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function demoModel(){
+  const m={header:HEADER.slice(),depart:[1,0,3],chars:[Z10()],blocks:[Z24()],rooms:new Map(),liens:[],pics:[],gardes:[],portes:[],entree:null,fraga:[],tombe:[],enfonce:[],couleurs:[]};
+  m.header[0]='# niveau.txt -- exemple de l\'atelier (dessin original, pas un niveau du jeu).';
+  const ck=new Map(),bk=new Map();
+  const add=px=>{const b=[];for(let cy=0;cy<6;cy++)for(let cx=0;cx<4;cx++){const rows=[];for(let y=0;y<10;y++){let v=0;for(let x=0;x<8;x++)if(px[cy*10+y][cx*8+x])v|=0x80>>x;rows.push(v);}
+      if(rows.every(v=>!v)){b.push(0);continue;}const s=rows.join(',');if(!ck.has(s)){m.chars.push(rows);ck.set(s,m.chars.length-1);}b.push(ck.get(s));}
+    const s=b.join(',');if(!b.some(Boolean))return 0;if(!bk.has(s)){m.blocks.push(b);bk.set(s,m.blocks.length-1);}return bk.get(s);};
+  const blank=()=>Array.from({length:60},()=>new Uint8Array(32));
+  const floor=(p,r,crack)=>{for(let x=0;x<32;x++){p[50][x]=1;p[51][x]=x%2;for(let y=52;y<55;y++)p[y][x]=1;p[55][x]=0;for(let y=56;y<59;y++)p[y][x]=(x%16<14)?1:0;}
+    if(r)for(let n=0;n<3;n++){p[52+(r()*3|0)][r()*32|0]=0;}
+    if(crack)for(const [x,y] of [[9,52],[10,53],[10,54],[22,52],[23,53],[22,54],[16,51]])p[y][x]=0;return p;};
+  const wall=r=>{const p=blank();for(let y=0;y<60;y++){const yy=y%5,off=((y/5|0)%2)*8;for(let x=0;x<32;x++){const xx=(x+off)%16;p[y][x]=(yy===4||xx===15)?0:1;}}
+    if(r)for(let n=0;n<4;n++){p[r()*60|0][r()*32|0]^=1;}return p;};
+  const pillar=r=>{const p=floor(blank(),r);for(let y=4;y<50;y++){p[y][10]=1;p[y][21]=1;for(let x=12;x<20;x++)p[y][x]=((x+y)%5===0)?1:0;}for(let x=8;x<24;x++){p[2][x]=1;p[3][x]=1;p[48][x]=1;p[49][x]=x%2;}return p;};
+  const spikes=(h,r)=>{const p=floor(blank(),r);for(const sx of [5,15,25])for(let y=0;y<h;y++){const w=Math.max(0,(h-y)/h*2|0);for(let x=sx-w;x<=sx+w;x++)p[49-y][x]=1;}return p;};
+  const r1=mulberry(11),r2=mulberry(23),r3=mulberry(37),r4=mulberry(51);
+  const W=[add(wall()),add(wall(r1)),add(wall(r2)),add(wall(r3))];
+  const F=[add(floor(blank())),add(floor(blank(),r4)),add(floor(blank(),r2))];
+  const P=add(pillar()),X=add(floor(blank(),null,true)),S1=add(spikes(3)),S2=add(spikes(9));
+  m.pics.push([S1,S2]);
+  const T=TYPES;let wi=0,fi=0;
+  const room=(rows,vo)=>{const bl=[],ty=[];for(const ch of rows.join('')){
+    const t={'#':T.mur,'_':T.sol,'|':T.pilier,'.':T.vide,'x':T.fragile,'^':T.pics}[ch];ty.push(t);
+    bl.push(ch==='#'?W[(wi++)%4]:ch==='_'?F[(fi++)%3]:ch==='|'?P:ch==='x'?X:ch==='^'?S1:0);}return{bl,ty,vo};};
+  m.rooms.set(1,room(['##____|___','#..x__..__','##___^__##'],[0,2,0,0]));
+  m.rooms.set(2,room(['____..__##','__|______#','##_^___x_#'],[1,0,0,0]));
+  return m;
+}
+
+// ---------- état ----------
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+const S={room:1,tile:null,block:1,char:1,tool:'select',scope:'partout',typeBrush:1,logic:true,grid:false,tab:'bloc',bmode:'draw',bscope:'partout',charSort:'num',preview:'apres',
+  opt:{speck:0,tolC:0,capC:126,tolB:0},hover:null};
+let M=null,N=null,NR=null,base=null,ver=0,undo=[],redo=[],nameLoaded='';
+let Uc=null,Uver=-1;const use=()=>{if(Uver!==ver){Uc=usage(M);Uver=ver;}return Uc;};
+const optOn=()=>S.tab==='opt'&&N;
+const view=()=>optOn()&&S.preview!=='avant'?N:M;
+let Vuc=null,Vkey='';const useV=()=>{const V=view();if(V===M)return use();const k='N'+ver;if(Vkey!==k){Vuc=usage(V);Vkey=k;}return Vuc;};
+function pushUndo(){undo.push(cloneModel(M));if(undo.length>80)undo.shift();redo.length=0;}
+function changed(){ver++;if(S.tab==='opt')N=null;clampSel();renderAll();save();}
+function clampSel(){if(!M.rooms.has(S.room))S.room=M.rooms.has(M.depart[0])?M.depart[0]:[...M.rooms.keys()][0];if(S.block>=M.blocks.length)S.block=M.blocks.length-1;if(S.char>=M.chars.length)S.char=M.chars.length-1;}
+
+// ---------- dessin ----------
+const LE=new Uint8Array(new Uint32Array([1]).buffer)[0]===1;
+const pack=h=>{const r=parseInt(h.slice(1,3),16),g=parseInt(h.slice(3,5),16),b=parseInt(h.slice(5,7),16);return LE?((255<<24)|(b<<16)|(g<<8)|r)>>>0:((r<<24)|(g<<16)|(b<<8)|255)>>>0;};
+const PK={bg:pack(SCR.bg),fg:pack(SCR.fg),add:pack(SCR.add),del:pack(SCR.del),dim:pack(SCR.dim)};
+// murs generes : le meme calcul que niveau2exl.py (murs_cars, mur_n) et que le moteur (wall_ch)
+const RND=(()=>{const t=[];let x=0x1234;for(let i=0;i<256;i++){x=(x*25173+13849)&0xFFFF;t.push(x>>8);}return t;})();
+const FORMES=[[[0,2],[1,1],[2,0],[3,1],[4,2]],[[2,0],[1,1],[0,2],[1,3],[2,4]],[[0,3],[1,2],[2,1],[3,0]],[[0,0],[1,1],[2,2],[3,3]],[[0,0],[1,1],[1,2],[2,3]],[[0,0],[0,1],[0,2],[1,2],[2,2]],[[0,1],[1,0],[2,1],[3,0]]];
+// style "pierres" (facon Macintosh) : niveau2exl.py pierres_cars, meme tirage
+function pierresCars(S,F,T,O){const out=[];
+  for(let n=0;n<48;n++){let x=(S*7919+n*104729+12345)>>>0;const r=m=>{x=(Math.imul(x,1664525)+1013904223)>>>0;return (x>>>16)%m;};
+    let part,p=null,w=0;if(n<16){part=n&1;p=1+r(6);w=r(100)<T?2:1;}else part=(n-16)>>4;
+    const dam=(y,b)=>((y+b)&1)===0?1:0,g=[];for(let y=0;y<10;y++)g.push([1,1,1,1,1,1,1,1]);
+    if(part===0)g[0]=[0,0,0,0,0,0,0,0];else for(let y=10-O;y<10;y++)for(let b=0;b<8;b++)g[y][b]=dam(y,b);
+    if(p!==null){for(let y=0;y<10;y++){if(part===0&&y===0)continue;for(let b=Math.max(0,p-O);b<p;b++)g[y][b]=dam(y,b);for(let b=p;b<Math.min(8,p+w);b++)g[y][b]=0;}
+      const yc=part===0?1:9;for(const b of [p-1,p+w])if(b>=0&&b<8)g[yc][b]=0;}
+    const face=[];for(let y=part===0?2:0;y<(part===1?9-O:9);y++)for(let b=0;b<8;b++)if(g[y][b]&&(p===null||b<p-O-1||b>p+w))face.push([y,b]);
+    const dedans=new Set(face.map(q=>q[0]*8+q[1]));
+    if(face.length&&r(100)<F){const f=FORMES[r(FORMES.length)];
+      for(let t=0;t<8;t++){const [y,b]=face[r(face.length)];const pts=f.map(([dy,dx])=>[y+dy,b+dx]);
+        if(pts.every(([yy,bb])=>yy>=0&&yy<10&&bb>=0&&bb<8&&dedans.has(yy*8+bb))){for(const [yy,bb] of pts)g[yy][bb]=0;break;}}}
+    out.push(g.map(l=>l.reduce((a,v,b)=>a|(v<<(7-b)),0)));}return out;}
+function mursCars(S,D,T,E=4,style=0){if(style===1)return pierresCars(S,D,T,E);const out=[],V=[[-1,0],[1,0],[0,-1],[0,1]];
+  for(let n=0;n<48;n++){let x=(S*7919+n*104729+12345)>>>0;const r=m=>{x=(Math.imul(x,1664525)+1013904223)>>>0;return (x>>>16)%m;};
+    let part,mask=0;if(n<16){part=n&1;const p=r(7),w=r(100)<T?2:1;for(let k=0;k<w;k++)mask|=0x80>>(p+k);}else part=(n-16)>>4;
+    const g=[];for(let y=0;y<10;y++){const l=[];for(let b=0;b<8;b++)l.push(((0xFF&~mask)>>(7-b))&1);g.push(l);}if(part===0)g[0]=[0,0,0,0,0,0,0,0];
+    const bord=(y,b)=>{if(part===1&&y===9)return true;return V.some(([dy,db])=>y+dy>=0&&y+dy<10&&b+db>=0&&b+db<8&&!g[y+dy][b+db]);};
+    const allum=[];for(let y=0;y<10;y++)for(let b=0;b<8;b++)if(g[y][b])allum.push([y,b]);
+    const bords=allum.filter(q=>bord(q[0],q[1])),dedans=allum.filter(q=>!bord(q[0],q[1])),h=g.map(l=>l.slice());
+    const ne=bords.length?r(E+1):0;
+    for(let e=0;e<ne;e++){const [y,b]=bords[r(bords.length)];h[y][b]=0;const pts=[[y,b]];const ng=r(3);
+      for(let k=0;k<ng;k++){const c=[];for(const [yy,bb] of pts)for(const [dy,db] of V){const a=yy+dy,c2=bb+db;if(a>=0&&a<10&&c2>=0&&c2<8&&h[a][c2])c.push([a,c2]);}
+        if(!c.length)break;const [a,c2]=c[r(c.length)];h[a][c2]=0;pts.push([a,c2]);}}
+    const nd=dedans.length?r(D+1):0;for(let d=0;d<nd;d++){const [y,b]=dedans[r(dedans.length)];h[y][b]=0;}
+    out.push(h.map(l=>l.reduce((a,v,b)=>a|(v<<(7-b)),0)));}return out;}
+function murN(room,ti,rc,S){const x=RND[(room*29+ti*13+S+(rc>>3)*71)&255],part=(rc>>2)&1;if((rc&3)===(x&3))return((x>>4)&0x0E)+part;return 16+part*16+(RND[(x+(rc&3)*53+part*97)&255]&15);}
+let mcKey='',mcVal=null;const murCache=m=>{const k=m.murs.join(',');if(k!==mcKey){mcKey=k;mcVal=mursCars(...m.murs);}return mcVal;};
+function roomBits(V,rn){const out=new Uint8Array(320*180);const R=V.rooms.get(rn);if(!R)return out;const mc=V.murs?murCache(V):null;
+  for(let i=0;i<30;i++){const gen=mc&&(R.ty[i]&0x1F)===20,blk=gen?null:V.blocks[R.bl[i]];if(!gen&&!blk)continue;const ox=(i%10)*32,oy=(i/10|0)*60;
+    for(let cell=0;cell<24;cell++){const c=gen?1:blk[cell];if(!c)continue;const ch=gen?mc[murN(rn,i,cell,V.murs[0])]:V.chars[c];if(!ch)continue;const cx=ox+(cell&3)*8,cy=oy+(cell>>2)*10;
+      for(let y=0;y<10;y++){const v=ch[y];if(!v)continue;const base=(cy+y)*320+cx;for(let x=0;x<8;x++)if(v&(0x80>>x))out[base+x]=1;}}}
+  return out;}
+const off=document.createElement('canvas');off.width=320;off.height=180;const offx=off.getContext('2d');
+function bitsToOff(bits,bits2){const img=offx.createImageData(320,180),u=new Uint32Array(img.data.buffer);
+  if(!bits2){for(let p=0;p<u.length;p++)u[p]=bits[p]?PK.fg:PK.bg;}
+  else for(let p=0;p<u.length;p++){const a=bits[p],b=bits2[p];u[p]=a&&b?PK.dim:b?PK.add:a?PK.del:PK.bg;}
+  offx.putImageData(img,0,0);}
+const roomCv=$('#room'),rctx=roomCv.getContext('2d');let roomKey='';
+function renderRoom(){
+  const V=view(),diff=optOn()&&S.preview==='diff',key=`${ver}|${S.room}|${V===M?'M':'N'}|${diff}|${N?1:0}`;
+  if(key!==roomKey){roomKey=key;if(diff)bitsToOff(roomBits(M,S.room),roomBits(N,S.room));else bitsToOff(roomBits(V,S.room));}
+  const c=rctx;c.imageSmoothingEnabled=false;c.drawImage(off,0,0,1280,720);
+  if(S.grid){c.strokeStyle=SCR.grid2;c.lineWidth=1;c.beginPath();for(let x=32;x<1280;x+=32){c.moveTo(x+.5,0);c.lineTo(x+.5,720);}for(let y=40;y<720;y+=40){c.moveTo(0,y+.5);c.lineTo(1280,y+.5);}c.stroke();}
+  c.strokeStyle=SCR.grid;c.lineWidth=1.5;c.beginPath();for(let x=128;x<1280;x+=128){c.moveTo(x,0);c.lineTo(x,720);}for(let y=240;y<720;y+=240){c.moveTo(0,y);c.lineTo(1280,y);}c.stroke();
+  const R=V.rooms.get(S.room);if(!R)return;
+  c.font='600 17px "IBM Plex Mono",monospace';c.textBaseline='top';
+  if(S.logic)for(let i=0;i<30;i++){const t=R.ty[i],nm=NOMS[t]??String(t),lab=COURT[nm]??nm;if(!lab)continue;const x=(i%10)*128+5,y=(i/10|0)*240+5,w=c.measureText(lab).width;
+    c.fillStyle='rgba(0,0,0,.72)';c.fillRect(x-3,y-2,w+6,22);c.fillStyle=SCR.kind[KIND(t)];c.fillText(lab,x,y+1);}
+  if(S.logic){c.save();c.setLineDash([10,6]);c.lineWidth=3;c.strokeStyle='#ff4d3a';
+    for(const q of mismatches(V))if(q.r===S.room){c.strokeRect((q.i%10)*128+4,(q.i/10|0)*240+4,120,232);}c.restore();}
+  const mark=(i,txt,col)=>{const x=(i%10)*128+5,y=(i/10|0)*240+200,w=c.measureText(txt).width;c.fillStyle=col;c.fillRect(x-3,y-2,w+6,22);c.fillStyle='#000';c.fillText(txt,x,y+1);};
+  if(M.depart[0]===S.room)mark(M.depart[1]*10+M.depart[2],'DÉPART',SCR.sel);
+  for(const g of M.gardes)if(g[0]===S.room)mark(g[1]*10+g[2],g[3]?'◀ GARDE':'GARDE ▶','#ff9a8a');
+  if(M.entree&&M.entree[0]===S.room)mark(M.entree[1]*10+M.entree[2],'ENTRÉE','#9fe0a8');
+  const h=S.hover;
+  if(h&&!optOn()){c.lineWidth=2;c.strokeStyle='rgba(255,255,255,.55)';
+    if(S.tool==='pen'){c.strokeStyle=SCR.sel;c.strokeRect(h.px*4-1,h.py*4-1,6,6);}else c.strokeRect((h.i%10)*128+1,(h.i/10|0)*240+1,126,238);}
+  if(S.tile!=null){c.lineWidth=3;c.strokeStyle=SCR.sel;c.strokeRect((S.tile%10)*128+1.5,(S.tile/10|0)*240+1.5,125,237);}
+}
+const mapCv=$('#map'),mctx=mapCv.getContext('2d');let mapTimer=0,mapLayout=null;
+function placer(m){const pos=new Map(),occ=new Set();const start=m.rooms.has(m.depart[0])?m.depart[0]:[...m.rooms.keys()][0];pos.set(start,[0,0]);occ.add('0,0');const st=[start],D=[[-1,0],[1,0],[0,-1],[0,1]];
+  while(st.length){const r=st.pop(),[x,y]=pos.get(r);m.rooms.get(r).vo.forEach((n,k)=>{const q=[x+D[k][0],y+D[k][1]];if(n&&m.rooms.has(n)&&!pos.has(n)&&!occ.has(q.join())){pos.set(n,q);occ.add(q.join());st.push(n);}});}
+  let mx=Infinity,my=Infinity,Mx=-Infinity,My=-Infinity;for(const [x,y] of pos.values()){mx=Math.min(mx,x);my=Math.min(my,y);Mx=Math.max(Mx,x);My=Math.max(My,y);}
+  const out=new Map();for(const [r,[x,y]] of pos)out.set(r,[x-mx,y-my]);let w=Mx-mx+1,h=My-my+1,k=0;
+  const rest=[...m.rooms.keys()].filter(r=>!out.has(r)).sort((a,b)=>a-b);if(rest.length){for(const r of rest){out.set(r,[k%w,h+(k/w|0)]);k++;}h+=Math.ceil(rest.length/w);}
+  return{pos:out,w,h};}
+function renderMap(){
+  const V=view(),L=placer(V),CW=128,CH=72,G=10,P=8;mapLayout={L,CW,CH,G,P};
+  mapCv.width=P*2+L.w*(CW+G)-G;mapCv.height=P*2+L.h*(CH+G)-G;mapCv.style.width=Math.min(mapCv.width,1200)+'px';
+  const c=mctx;c.clearRect(0,0,mapCv.width,mapCv.height);c.imageSmoothingEnabled=true;c.imageSmoothingQuality='high';
+  c.font='600 12px "IBM Plex Mono",monospace';c.textBaseline='top';const mm=mismatches(V);
+  for(const [r,[x,y]] of L.pos){const X=P+x*(CW+G),Y=P+y*(CH+G);bitsToOff(roomBits(V,r));c.drawImage(off,X,Y,CW,CH);
+    c.fillStyle='rgba(0,0,0,.75)';c.fillRect(X,Y,r>9?24:16,16);c.fillStyle=r===M.depart[0]?SCR.sel:'#cfd6e6';c.fillText(String(r),X+3,Y+2);
+    c.lineWidth=r===S.room?3:1;c.strokeStyle=r===S.room?SCR.sel:'rgba(140,160,200,.5)';c.strokeRect(X+.5,Y+.5,CW-1,CH-1);
+    const nm=mm.filter(q=>q.r===r).length;if(nm){c.fillStyle='#ff4d3a';c.beginPath();c.arc(X+CW-9,Y+9,7,0,7);c.fill();c.fillStyle='#fff';c.textAlign='center';c.fillText(String(nm),X+CW-9,Y+3);c.textAlign='start';}}
+  roomKey='';}
+function scheduleMap(){clearTimeout(mapTimer);mapTimer=setTimeout(renderMap,60);}
+const NOMSC=['noir','rouge','vert','jaune','bleu','magenta','cyan','blanc'],HEXC=['#555','#ff5a4a','#48d860','#ffe040','#5a8cff','#ff60f0','#50f0f0',null];
+function colIdx(id,m=M){const v=(m.couleurs||[]).find(v=>v[0]===id);return v?v[1]:7;}
+function colOf(id,m=M){const k=colIdx(id,m);return HEXC[k]||SCR.fg;}
+function drawChar(c,ch,x,y,s,col){c.fillStyle=col;for(let r=0;r<10;r++){const v=ch[r];if(!v)continue;for(let b=0;b<8;b++)if(v&(0x80>>b))c.fillRect(x+b*s,y+r*s,s,s);}}
+function renderCharPal(cv){
+  const V=view(),U=useV(),wrap=cv.parentElement,CW=28,CH=34,cols=Math.max(4,Math.floor((wrap.clientWidth||360)/CW));
+  let ids=[...Array(V.chars.length).keys()];if(S.charSort==='usage')ids=[0,...ids.slice(1).sort((a,b)=>U.cu[b]-U.cu[a]||a-b)];
+  cv.width=cols*CW;cv.height=Math.ceil(ids.length/cols)*CH;const c=cv.getContext('2d');c.fillStyle=SCR.bg;c.fillRect(0,0,cv.width,cv.height);
+  ids.forEach((id,k)=>{const x=(k%cols)*CW+2,y=(k/cols|0)*CH+2;
+    if(id===0){c.strokeStyle=SCR.dim;c.lineWidth=1;c.strokeRect(x+.5,y+.5,23,29);c.beginPath();c.moveTo(x,y);c.lineTo(x+24,y+30);c.stroke();}
+    else drawChar(c,V.chars[id],x,y,3,U.cref[id]?colOf(id,V):SCR.dim);
+    if(id===S.char&&!optOn()){c.lineWidth=2;c.strokeStyle=SCR.sel;c.strokeRect(x-1,y-1,26,32);}});
+  cv._ids=ids;cv._cols=cols;cv._cw=CW;cv._ch=CH;}
+const libCv=$('#lib');
+function renderLib(){
+  const V=view(),U=useV(),CW=40,CH=76,cols=Math.max(4,Math.floor((libCv.parentElement.clientWidth||600)/CW)),n=V.blocks.length;
+  libCv.width=cols*CW;libCv.height=Math.ceil(n/cols)*CH;const c=libCv.getContext('2d');c.fillStyle=SCR.bg;c.fillRect(0,0,libCv.width,libCv.height);
+  const img=c.createImageData(32,60),u=new Uint32Array(img.data.buffer);c.font='11px "IBM Plex Mono",monospace';c.textBaseline='top';c.textAlign='center';
+  for(let b=0;b<n;b++){const x=(b%cols)*CW+4,y=(b/cols|0)*CH+3,used=b===0||U.bu[b]||U.prot.has(b),fg=used?PK.fg:PK.dim,w=blockWords(V,b);
+    for(let yy=0;yy<60;yy++){const v=w[yy];for(let xx=0;xx<32;xx++)u[yy*32+xx]=(v>>>(31-xx))&1?fg:PK.bg;}
+    c.putImageData(img,x,y);c.strokeStyle='rgba(140,160,200,.35)';c.lineWidth=1;c.strokeRect(x-.5,y-.5,33,61);
+    c.fillStyle=used?SCR.lab:SCR.dim;c.fillText(b===0?'vide':String(b),x+16,y+62);
+    if(b===S.block&&!optOn()){c.strokeStyle=SCR.sel;c.lineWidth=2;c.strokeRect(x-2,y-2,36,64);}}
+  libCv._cols=cols;
+  const inus=[...Array(n).keys()].filter(b=>b&&!U.bu[b]&&!U.prot.has(b)).length;
+  $('#libInfo').textContent=`${n-1} blocs${inus?` · ${inus} inutilisés (en gris)`:''}`+(optOn()?' · aperçu':' · clic : choisir ; double-clic : poser sur la case choisie');}
+const blkCv=$('#blkCv'),chCv=$('#chCv');S.shNum=true;
+$('#shNum').addEventListener('change',e=>{S.shNum=e.target.checked;renderBlockEd();});
+blkCv.addEventListener('mousemove',ev=>{if(!S.block){blkCv.title='';return;}const p=pt(blkCv,ev,32,60);if(!p){blkCv.title='';return;}const cell=(p[1]/10|0)*4+(p[0]>>3),ch=M.blocks[S.block][cell];
+  blkCv.title=`cellule ${cell} (ligne ${cell>>2}, colonne ${cell&3}) · ${ch?'caractère '+ch:'vide'}`;});
+function renderBlockEd(){
+  const c=blkCv.getContext('2d'),s=7,b=S.block,U=use();c.fillStyle=SCR.bg;c.fillRect(0,0,224,420);
+  const bl=M.blocks[b];for(let cell=0;cell<24;cell++){const ch=bl[cell];if(ch)drawChar(c,M.chars[ch],(cell&3)*56,(cell>>2)*70,s,SCR.fg);}
+  c.strokeStyle=SCR.grid2;c.lineWidth=1;c.beginPath();for(let x=s;x<224;x+=s){c.moveTo(x+.5,0);c.lineTo(x+.5,420);}for(let y=s;y<420;y+=s){c.moveTo(0,y+.5);c.lineTo(224,y+.5);}c.stroke();
+  c.strokeStyle=SCR.grid;c.lineWidth=1.5;c.beginPath();for(let x=56;x<224;x+=56){c.moveTo(x,0);c.lineTo(x,420);}for(let y=70;y<420;y+=70){c.moveTo(0,y);c.lineTo(224,y);}c.stroke();
+  if(b&&S.shNum){c.font='bold 11px "IBM Plex Mono",monospace';c.textBaseline='top';c.textAlign='left';
+    for(let cell=0;cell<24;cell++){const ch=bl[cell],x=(cell&3)*56,y=(cell>>2)*70,hot=ch===S.char,t=String(ch),w=c.measureText(t).width+6;
+      if(hot){c.strokeStyle=SCR.sel;c.lineWidth=3;c.strokeRect(x+1.5,y+1.5,53,67);}
+      c.fillStyle=hot?SCR.sel:'rgba(10,14,24,.78)';c.fillRect(x+2,y+2,w,14);c.fillStyle=hot?'#000':(ch?'#cfd6e6':SCR.dim);c.fillText(t,x+5,y+4);}}
+  if(b===0){c.fillStyle='rgba(0,0,0,.6)';c.fillRect(0,170,224,80);c.fillStyle='#cfd6e6';c.font='13px "IBM Plex Sans",sans-serif';c.textAlign='center';c.fillText('Bloc 0 : la case vide.',112,200);c.fillText('Choisissez un bloc ou créez-en un.',112,222);c.textAlign='start';}
+  $('#blkTitle').textContent=b?`Bloc ${b}`:'Bloc 0 (vide)';
+  {const L=b?blkRooms(view(),b):[];$('#blkUse').innerHTML=b?`posé ${U.bu[b]} fois${U.prot.has(b)?' · pics, porte ou fragile animé':''}${L.length?' · '+(L.length>1?'salles ':'salle ')+L.map(([r,n,f])=>`<a href="#" data-go="${r}" data-t="${f}" title="aller à la salle ${r}, étage ${f/10|0}, case ${f%10}">${r}</a>${n>1?` (×${n})`:''}`).join(', '):''}`:'';}
+  $('#putInfo').textContent=S.char?`n° ${S.char}`:'vide';}
+function renderCharEd(){
+  const c=chCv.getContext('2d'),s=22,id=S.char,U=use();c.fillStyle=SCR.bg;c.fillRect(0,0,176,220);
+  if(id)drawChar(c,M.chars[id],0,0,s,colOf(id));
+  {const sel=$('#chCol');if(sel){sel.disabled=!id;sel.value=String(colIdx(id));}}
+  c.strokeStyle=SCR.grid;c.lineWidth=1;c.beginPath();for(let x=s;x<176;x+=s){c.moveTo(x+.5,0);c.lineTo(x+.5,220);}for(let y=s;y<220;y+=s){c.moveTo(0,y+.5);c.lineTo(176,y+.5);}c.stroke();
+  if(!id){c.fillStyle='#cfd6e6';c.font='13px "IBM Plex Sans",sans-serif';c.textAlign='center';c.fillText('0 = vide :',88,100);c.fillText('choisissez un caractère',88,120);c.textAlign='start';}
+  $('#chTitle').textContent=id?`Caractère ${id}`:'Caractère 0 (vide)';
+  {const L=id?chBlocks(M,id):[];$('#chUse').innerHTML=id?`${U.cref[id]} cellules dans ${U.cblk[id]} blocs · ${U.cu[id]} fois à l'écran${L.length?' · '+(L.length>1?'blocs ':'bloc ')+L.map(([b,n])=>`<a href="#" data-blk="${b}" title="ouvrir le bloc ${b}${U.bu[b]?'':' (inutilisé)'}">${b}</a>${n>1?` (×${n})`:''}`).join(', '):''}`:'';}
+  $('#chRepl').max=M.chars.length-1;}
+function renderChips(){
+  const st=stats(M),d=st.size-base.size;
+  const chip=(lbl,v,max)=>`<span class="chip${v>max?' over':v>max*.94?' near':''}">${lbl} <b>${v}</b>/${max}</span>`;
+  $('#chips').innerHTML=chip('caractères',st.nc,MAXT).replace('<span class="chip',`<span title="caractères du décor (générateur BAGC2)${M.murs?' ; les 48 briques des murs générés sont à part (BAGC1)':''}" class="chip`)+chip('blocs',st.nb,MAXB)+chip('rangées',st.nr,MAXR)+
+    `<span class="chip" title="Estimation : la compilation ajoute les images des grilles">niveau ≈ <b>${st.size}</b> o${d?` (${d>0?'+':''}${d})`:''}</span>`;
+  const mk=$('#markCv').getContext('2d');mk.clearRect(0,0,8,10);if(S.char&&M.chars[S.char])drawChar(mk,M.chars[S.char],0,0,1,SCR.fg);}
+function renderNav(){
+  const R=M.rooms.get(S.room);$('#roomTitle').textContent=`Salle ${S.room}`;
+  $('#nav').innerHTML=['←','→','↑','↓'].map((a,k)=>{const n=R.vo[k];return`<button data-go="${n}" ${n&&M.rooms.has(n)?'':'disabled'} title="Alt+${a}">${a} ${n||'–'}</button>`;}).join('');}
+function typeOptions(sel){let h='';const keys=Object.keys(NOMS).map(Number).sort((a,b)=>NOMS[a].localeCompare(NOMS[b]));if(!(sel in NOMS))h+=`<option value="${sel}" selected>${sel}</option>`;
+  for(const k of keys)h+=`<option value="${k}"${k===sel?' selected':''}>${NOMS[k]}</option>`;return h;}
+function renderInspector(){
+  const el=$('#insp');if(optOn()){el.innerHTML='<small>Aperçu de l\'optimisation : appliquez-la ou quittez l\'onglet « Optimiser » pour reprendre la main.</small>';return;}
+  const R=M.rooms.get(S.room),U=use();
+  let h=`<div class="grp"><span class="lbl">Voisines</span>${['gauche','droite','haut','bas'].map((n,k)=>`<label>${n}<input type="number" min="0" max="24" data-vo="${k}" value="${R.vo[k]}"></label>`).join('')}</div>`;
+  if(S.tile!=null){const i=S.tile,e=i/10|0,c=i%10,b=R.bl[i],t=R.ty[i],k=[S.room,e,c].join(' ');
+    h+=`<div class="grp"><span class="lbl">Case ${e}·${c}</span><label>Bloc <input type="number" id="inBlk" min="0" max="${M.blocks.length-1}" value="${b}"></label><small>posé ${U.bu[b]} fois</small>
+      <label>Type <select id="inTy">${typeOptions(t)}</select></label><button id="inDep">Départ ici</button></div>`;
+    if([6,15].includes(t&0x1F)){const en=(M.enfonce||[]).find(v=>v[0]===S.room&&v[1]===e&&v[2]===c);
+      h+=`<div class="grp"><span class="lbl">Bouton en perspective</span><label>hauteur <input type="number" id="bvH" min="1" max="3" value="1" style="width:3.5em"></label><label>pente <input type="number" id="bvS" min="0" max="4" step="0.1" value="1.2" style="width:4.5em"></label><label>joint droit en bas à <input type="number" id="bvO" min="0" max="63" value="32" style="width:4em"></label><label>joint gauche en bas à <input type="text" id="bvG" placeholder="auto" style="width:4em"></label><label>dessus à la ligne <input type="text" id="bvY" placeholder="auto" style="width:4em"></label><label><input type="checkbox" id="bvE" checked> enfoncé = sol d'origine, sans traits (moins de caractères)</label><button id="bvGo">Fabriquer</button>
+      <small>Le bouton est la dalle de cette case, fermée à droite par un trait noir en diagonale (comme la perspective : il part du bas, à « joint en bas à » points du bord gauche de la case — 32 : le bord droit — et monte vers la droite de « pente » points par ligne, sur la case de droite). Si le sol continue à gauche de la case (pas de bord en pente), un 2e trait parallèle ferme le bouton à gauche : « joint gauche » vide = automatique (trait au bord gauche de la case si le sol de la case de gauche y arrive), un nombre = sa position en bas, -1 = pas de trait. « dessus à la ligne » (0 à 19, dans les 2 dernières rangées du bloc) : la 1re ligne de la dalle, si l'automatique se trompe (par exemple quand le décor tramé derrière touche la dalle). Relevé : la dalle entre les traits monte de « hauteur » points ; enfoncé : elle est au niveau du sol, avec les traits, ou sans eux si la case « sol d'origine » est cochée (le prince est dessus : on ne voit presque pas la différence, et cela évite de nouveaux caractères). Les deux cases sont changées.${en?` Actuellement : enfoncé ${en[3]}${en[4]!=null?' + '+en[4]:''} (refaire remplace ce bouton, les blocs qui ne servent plus sont retirés ; <button id="bvRaz">défaire</button>)`:''}</small></div>`;}
+    if((t&0x1F)===11&&b){const fa=(M.fraga||[]).find(v=>v[0]===b)||[b,0,0];
+      {const tb=(M.tombe||[]).find(v=>v[0]===S.room&&v[1]===e&&v[2]===c);
+      h+=`<div class="grp"><span class="lbl">Débris</span><label>bloc <input type="number" id="inDb" min="1" max="${M.blocks.length-1}" value="${M.debris??''}" placeholder="auto"></label><small>la case de sol où se pose une dalle tombée prend ce bloc (toutes les dalles) ; vide : automatique (bloc ${autoDebris(M)})</small></div>`;
+      h+=`<div class="grp"><span class="lbl">Une fois tombée</span><label>bloc <input type="number" id="inTb" min="0" max="${M.blocks.length-1}" value="${tb?tb[3]:''}" placeholder="auto"></label><small>vide : automatique (bloc ${autoTombe(M,S.room,e,c)}, le trou le plus courant du niveau à côté d'une case comme sa voisine de gauche)</small></div>`;}
+      h+=`<div class="grp"><span class="lbl">Tremblement</span><label>image 1 <input type="number" id="inFa1" min="0" max="${M.blocks.length-1}" value="${fa[1]}"></label><label>image 2 <input type="number" id="inFa2" min="0" max="${M.blocks.length-1}" value="${fa[2]}"></label><label>tempo <input type="number" id="inFaT" min="1" max="8" value="${M.ftempo||2}"></label><small>bloc ${b} → image 1 → image 2 → ${b}, pour toutes les cases fragiles du bloc ${b} (0 et 0 : pas d'animation ; 3 animations au plus). Tempo : chaque image dure autant de pas (environ 0,1 s le pas), le même pour toutes.</small></div>`;}
+    const info=[];for(const v of M.liens){if(v.slice(0,3).join(' ')===k)info.push(`commande la case ${v.slice(3).join(' ')}`);if(v.slice(3).join(' ')===k)info.push(`commandée par le bouton ${v.slice(0,3).join(' ')}`);}
+    for(const g of M.gardes)if(g.slice(0,3).join(' ')===k)info.push(`garde tourné à ${g[3]?'gauche':'droite'}, niveau ${g[4]}, ${g[5]} PV`);
+    for(const [a,z] of M.pics)if(b===a)info.push(`pics : prend le bloc ${z} quand ils sortent`);
+    for(const v of (M.fraga||[]))if(b===v[0]&&(t&0x1F)===11)info.push(`fragile animé : blocs ${v[0]} → ${v[1]} → ${v[2]} → ${v[0]}, ${M.ftempo||2} pas par image`);
+    if((t&0x1F)===11&&b&&(M.fraga||[]).length&&!(M.fraga||[]).some(v=>v[0]===b))info.push(`fragile animé automatiquement (niveau2exl.py) : les retouches de l'animation du bloc ${M.fraga[0][0]} posées sur le bloc ${b}`);
+    for(const p of M.portes)if(p.slice(0,3).join(' ')===k)info.push(`porte de sortie : blocs ouverts ${p[3]} et ${p[4]}`);
+    if(M.entree&&M.entree.join(' ')===k)info.push('le jeu appuie sur ce bouton au départ');
+    if((t&0x1F)===16)info.push(M.portes.some(p=>p.slice(0,3).join(' ')===k)?'sortie_g : la porte est dessinée sur les deux cases à sa droite (comme dans le jeu), le battant y monte ; « haut » sur cette case ou à côté finit le niveau':'sortie_g sans ligne « porte » : les boutons et les images ouvertes visent une autre case');
+    const mm=mismatches(M).find(q=>q.r===S.room&&q.i===i);if(mm)info.push('⚠ '+MISTXT[mm.k]);
+    if((t&0x1F)===17)info.push('sortie_d : moitié droite de la porte, pour la logique seulement');
+    if(info.length)h+=`<ul>${info.map(x=>`<li>${x}</li>`).join('')}</ul>`;}
+  else h+='<small>Outil « Choisir » : cliquez une case pour voir son bloc et son type.</small>';
+  el.innerHTML=h;}
+function renderToolOpts(){
+  const el=$('#toolOpts');roomCv.className=S.tab==='opt'?'t-off':'t-'+S.tool;
+  if(S.tool==='pen')el.innerHTML=`<fieldset class="seg"><legend>Portée</legend><label><input type="radio" name="scope" value="ici"${S.scope==='ici'?' checked':''}>Cette case seule</label><label><input type="radio" name="scope" value="partout"${S.scope==='partout'?' checked':''}>Partout</label></fieldset><small>${S.scope==='ici'?'copie le bloc et le caractère si besoin':'change le caractère dans tous ses blocs'}</small>`;
+  else if(S.tool==='block')el.innerHTML=`<small>Pose le bloc <b class="mono">${S.block}</b> (choisi dans la bibliothèque) sur les cases cliquées.</small>`;
+  else if(S.tool==='type')el.innerHTML=`<label class="check">Type <select id="typeBrush">${typeOptions(S.typeBrush)}</select></label><small>La logique seule ; l'image ne change pas.</small>`;
+  else el.innerHTML='<small>Survolez pour lire une case, cliquez pour la choisir.</small>';}
+function renderSide(){
+  if(S.tab==='bloc'){renderBlockEd();renderCharPal($('#chPalB'));}
+  else if(S.tab==='car'){renderCharEd();renderCharPal($('#chPalC'));}
+  else if(S.tab==='opt')renderOpt();
+  else if(S.tab==='mur')renderMurs();
+  else if(S.tab==='exp')renderExport();}
+const MUR_DEF={0:[3,50,4],1:[25,20,3]};
+const mursUI=()=>{const sty=+document.querySelector('input[name=mSty]:checked').value;return sty===1?[+$('#mS').value,+$('#mD').value,+$('#mT').value,+$('#mE').value,1]:[+$('#mS').value,+$('#mD').value,+$('#mT').value,+$('#mE').value];};
+function renderMurs(){{const u=$('#inBu');if(u&&document.activeElement!==u){u.value=M.bulle??'';u.classList.remove('bad-input');}}{const f=$('#inFl');if(f&&document.activeElement!==f){f.value=M.flamme?M.flamme.join(' '):'';f.classList.remove('bad-input');}}{const el=$('#inPl');if(el&&document.activeElement!==el){el.value=M.plafond??'';el.max=M.blocks.length-1;el.classList.remove('bad-input');}}
+  const on=!!M.murs,v=M.murs||[7,25,20,3,1],sty=v[4]===1?1:0;$('#mOn').checked=on;
+  document.querySelectorAll('input[name=mSty]').forEach(el=>{el.checked=+el.value===sty;el.disabled=!on;});
+  const mD=$('#mD'),mE=$('#mE');
+  if(sty===1){mD.max=100;mD.step=5;mE.min=1;mE.max=4;$('#mDL').textContent='Fissures';$('#mDH').textContent='Part des caractères qui ont une fissure (un chevron ou un trait).';$('#mEL').textContent='Ombre';$('#mEH').textContent='Largeur de l\'ombre en damier, en bas et à droite de chaque pierre (points).';}
+  else{mD.max=20;mD.step=1;mE.min=0;mE.max=20;$('#mDL').textContent='Points noirs isolés';$('#mDH').textContent='Au plus autant de taches au milieu des briques, par caractère (le nombre est tiré au hasard).';$('#mEL').textContent='Écornures';$('#mEH').textContent='Au plus autant de briques ébréchées contre le mortier (1 à 3 points), par caractère.';}
+  [['mS',0,''],['mD',1,sty===1?' %':''],['mT',2,' %'],['mE',3,'']].forEach(([id,k,u])=>{const el=$('#'+id);el.value=v[k];el.disabled=!on;$('#'+id+'V').textContent=v[k]+u;});
+  const cv=$('#mPal'),c=cv.getContext('2d'),cols=16,CW=28,CH=34,mc=mursCars(...v);cv.width=cols*CW;cv.height=Math.ceil(mc.length/cols)*CH;c.fillStyle=SCR.bg;c.fillRect(0,0,cv.width,cv.height);
+  mc.forEach((ch,k)=>drawChar(c,ch,(k%cols)*CW+2,(k/cols|0)*CH+2,3,on?SCR.fg:SCR.dim));}
+let mUndo=false;
+$('#inBu').addEventListener('change',e=>{const t=e.target,v=t.value.trim();if(v===''){if(M.bulle){pushUndo();M.bulle=null;changed();}return;}
+  const c=Number(v);if(!Number.isInteger(c)||c<1||c>=M.chars.length){t.classList.add('bad-input');return;}t.classList.remove('bad-input');pushUndo();M.bulle=c;changed();});
+$('#inFl').addEventListener('change',e=>{const t=e.target,v=t.value.trim();if(v===''){if(M.flamme){pushUndo();M.flamme=null;changed();}return;}
+  const a=v.split(/[\s,]+/).map(Number);if(a.length!==4||!a.every(c=>Number.isInteger(c)&&c>=1&&c<M.chars.length)){t.classList.add('bad-input');return;}t.classList.remove('bad-input');pushUndo();M.flamme=a;changed();});
+$('#inPl').addEventListener('change',e=>{const t=e.target;if(t.value===''){if(M.plafond!=null){pushUndo();M.plafond=null;changed();}return;}const b=+t.value;if(!(b>=1&&b<M.blocks.length)){t.classList.add('bad-input');return;}t.classList.remove('bad-input');pushUndo();M.plafond=b;changed();});
+$('#mOn').addEventListener('change',e=>{pushUndo();M.murs=e.target.checked?mursUI():null;changed();});
+document.querySelectorAll('input[name=mSty]').forEach(el=>el.addEventListener('change',()=>{if(!M.murs)return;pushUndo();const sty=+el.value,d=MUR_DEF[sty];M.murs=sty===1?[M.murs[0],...d,1]:[M.murs[0],...d];ver++;roomKey='';changed();}));
+for(const id of ['mS','mD','mT','mE']){const el=$('#'+id);
+  el.addEventListener('pointerdown',()=>{mUndo=false;});
+  el.addEventListener('input',()=>{if(!M.murs)return;if(!mUndo){pushUndo();mUndo=true;}M.murs=mursUI();ver++;roomKey='';renderMurs();renderRoom();renderChips();scheduleMap();save();});
+  el.addEventListener('change',()=>{mUndo=false;});}
+function renderAll(){if(S.tab==='opt'&&!N){const r=optimize(M,S.opt);N=r.m;NR=r.R;Vkey='';roomKey='';}renderChips();renderNav();renderToolOpts();renderRoom();renderInspector();renderLib();renderSide();scheduleMap();
+  $('#btnUndo').disabled=!undo.length;$('#btnRedo').disabled=!redo.length;}
+
+// ---------- optimiser ----------
+let optTimer=0;
+function renderOpt(){
+  if(!N){const r=optimize(M,S.opt);N=r.m;NR=r.R;Vkey='';roomKey='';}
+  const a=stats(compactModel(M)),b=stats(N),raw=stats(M);
+  const row=(l,x0,x,y,max)=>`<tr><td>${l}</td><td>${x0}</td><td class="${y>max?'over':''}">${y}</td><td class="${x-y>0?'gain':''}">${x-y>0?'−'+(x-y):'–'}</td></tr>`;
+  $('#oTable').innerHTML=`<tr><th></th><th>avant</th><th>après</th><th>gain</th></tr>`+row('caractères',raw.nc,raw.nc,b.nc,MAXT)+row('blocs',raw.nb,raw.nb,b.nb,MAXB)+row('rangées',raw.nr,raw.nr,b.nr,MAXR)+row('niveau ≈ octets',raw.size,raw.size,b.size,16384);
+  const parts=[];if(raw.nc>a.nc||raw.nb>a.nb)parts.push(`${raw.nc-a.nc} caractères et ${raw.nb-a.nb} blocs inutilisés retirés`);
+  if(NR.pixels)parts.push(`${NR.pixels} points effacés`);if(NR.chars)parts.push(`${NR.chars} fusions de caractères`);if(NR.blocks)parts.push(`${NR.blocks} fusions de blocs`);
+  $('#oNote').textContent=parts.length?parts.join(' · ')+'.':'Les doublons exacts sont toujours réunis. Bougez un curseur pour aller plus loin.';
+  $('#diffLegend').hidden=S.preview!=='diff';}
+function optInput(){S.opt.speck=+$('#oSpeck').value;S.opt.tolC=+$('#oTolC').value;S.opt.capC=+$('#oCap').value;S.opt.tolB=+$('#oTolB').value;
+  $('#oSpeckV').textContent=S.opt.speck?`≤ ${S.opt.speck} pt`:'aucune';$('#oTolCV').textContent=S.opt.tolC+' pt';$('#oCapV').textContent=S.opt.capC;$('#oTolBV').textContent=S.opt.tolB+' pt';
+  clearTimeout(optTimer);optTimer=setTimeout(()=>{N=null;renderOpt();renderRoom();renderLib();scheduleMap();},40);}
+function resetOptSliders(){const u=compactModel(M).chars.length-1;const cap=$('#oCap');cap.max=Math.max(8,u);cap.value=cap.max;$('#oSpeck').value=0;$('#oTolC').value=0;$('#oTolB').value=0;optInput();}
+
+// ---------- exporter ----------
+function renderExport(){
+  const txt=serialize(M,$('#xCompact').checked);$('#xText').value=txt;
+  let msgs=validate($('#xCompact').checked?compactModel(M):M);
+  try{parse(txt);}catch(e){msgs.unshift('relecture impossible : '+e.message);}
+  const mm=mismatches(M);
+  $('#xMsgs').innerHTML=(msgs.length?msgs.map(m=>`<div class="msg ${m[0]==='⚠'?'warn':'bad'}">${m}</div>`).join(''):'<div class="msg ok">Le texte se relit sans erreur et tient dans les limites du moteur.</div>')+
+    (mm.length?`<div class="msg warn">${mm.length} case${mm.length>1?'s':''} où l'image et la logique ne s'accordent pas (encadrées en rouge dans la salle) :<ul>${mm.slice(0,40).map(q=>`<li><a href="#" data-go="${q.r}" data-t="${q.i}">salle ${q.r}, étage ${q.i/10|0}, case ${q.i%10}</a> : ${MISTXT[q.k]}</li>`).join('')}</ul></div>`:'');
+  $('#xInfo').textContent=`${txt.split('\n').length-1} lignes`;}
+
+// ---------- édition ----------
+function newChar(src){M.chars.push(src?src.slice():Z10());return M.chars.length-1;}
+function newBlock(src){M.blocks.push(src?src.slice():Z24());return M.blocks.length-1;}
+const px=(m,b,x,y)=>{const c=m.blocks[b][(y/10|0)*4+(x>>3)];return c?(m.chars[c][y%10]>>(7-(x&7)))&1:0;};
+function paintBlockPx(b,x,y,v,scope){
+  if(px(M,b,x,y)===v)return;const cell=(y/10|0)*4+(x>>3);let c=M.blocks[b][cell];
+  if(c===0){c=newChar();M.blocks[b][cell]=c;}else if(scope!=='partout'&&use().cref[c]>1){c=newChar(M.chars[c]);M.blocks[b][cell]=c;}
+  const k=0x80>>(x&7);if(v)M.chars[c][y%10]|=k;else M.chars[c][y%10]&=~k;ver++;}
+function paintRoomPx(X,Y,v){
+  const R=M.rooms.get(S.room),i=(Y/60|0)*10+(X>>5),x=X&31,y=Y%60;
+  if(M.murs&&(R.ty[i]&0x1F)===20){$('#status').textContent='mur généré : réglez-le dans l\'onglet « Murs »';return;}
+  let b=R.bl[i];if(px(M,b,x,y)===v)return;const U=use();
+  if(b===0){b=newBlock();R.bl[i]=b;ver++;}else if(S.scope==='ici'&&U.bu[b]>1&&!U.prot.has(b)){b=newBlock(M.blocks[b]);R.bl[i]=b;ver++;}
+  paintBlockPx(b,x,y,v,S.scope==='ici'?'bloc':'partout');}
+function line(a,b,f){let x0=a[0],y0=a[1];const x1=b[0],y1=b[1],dx=Math.abs(x1-x0),dy=-Math.abs(y1-y0),sx=x0<x1?1:-1,sy=y0<y1?1:-1;let e=dx+dy;for(;;){f(x0,y0);if(x0===x1&&y0===y1)break;const e2=2*e;if(e2>=dy){e+=dy;x0+=sx;}if(e2<=dx){e+=dx;y0+=sy;}}}
+const pt=(cv,ev,W,H)=>{const r=cv.getBoundingClientRect();const x=Math.floor((ev.clientX-r.left)/r.width*W),y=Math.floor((ev.clientY-r.top)/r.height*H);return x>=0&&y>=0&&x<W&&y<H?[x,y]:null;};
+let drag=null;
+function roomInfo(X,Y){const V=view(),R=V.rooms.get(S.room),i=(Y/60|0)*10+(X>>5),b=R.bl[i],c=V.blocks[b][((Y%60)/10|0)*4+((X&31)>>3)];return{i,b,c,t:R.ty[i]};}
+roomCv.addEventListener('pointermove',ev=>{const p=pt(roomCv,ev,320,180);
+  if(!p){S.hover=null;renderRoom();return;}const q=roomInfo(p[0],p[1]);S.hover={px:p[0],py:p[1],i:q.i};
+  $('#status').textContent=`salle ${S.room} · étage ${q.i/10|0} · case ${q.i%10} · bloc ${q.b} · type ${NOMS[q.t]??q.t} · caractère ${q.c||'0 (vide)'} · point ${(p[0]&31)},${p[1]%60}`;
+  if(drag){const R=M.rooms.get(S.room);
+    if(S.tool==='pen'){line(drag.last,p,(x,y)=>paintRoomPx(x,y,drag.v));drag.last=p;roomKey='';if(S.tab==='bloc')renderBlockEd();}
+    else if(S.tool==='block'&&R.bl[q.i]!==S.block){R.bl[q.i]=S.block;ver++;}
+    else if(S.tool==='type'&&R.ty[q.i]!==S.typeBrush){R.ty[q.i]=S.typeBrush;ver++;}}
+  renderRoom();});
+roomCv.addEventListener('pointerleave',()=>{S.hover=null;renderRoom();});
+roomCv.addEventListener('pointerdown',ev=>{if(S.tab==='opt'||ev.button>0)return;const p=pt(roomCv,ev,320,180);if(!p)return;roomCv.setPointerCapture(ev.pointerId);
+  const R=M.rooms.get(S.room),q=roomInfo(p[0],p[1]);
+  if(S.tool==='select'){S.tile=q.i;S.block=q.b;if(q.c)S.char=q.c;renderAll();return;}
+  pushUndo();drag={last:p};
+  if(S.tool==='pen'){drag.v=1-px(M,R.bl[q.i],p[0]&31,p[1]%60);paintRoomPx(p[0],p[1],drag.v);}
+  else if(S.tool==='block'){R.bl[q.i]=S.block;ver++;}else if(S.tool==='type'){R.ty[q.i]=S.typeBrush;ver++;}
+  renderRoom();});
+const endDrag=()=>{if(drag){drag=null;changed();}};
+roomCv.addEventListener('pointerup',endDrag);roomCv.addEventListener('pointercancel',endDrag);
+let bdrag=null;
+blkCv.addEventListener('pointerdown',ev=>{if(ev.button>0||S.block===0)return;const p=pt(blkCv,ev,32,60);if(!p)return;const cell=(p[1]/10|0)*4+(p[0]>>3);
+  if(S.bmode==='pick'){S.char=M.blocks[S.block][cell];renderAll();return;}
+  pushUndo();blkCv.setPointerCapture(ev.pointerId);
+  if(S.bmode==='put'){M.blocks[S.block][cell]=S.char;ver++;bdrag={put:true};}
+  else{bdrag={v:1-px(M,S.block,p[0],p[1]),last:p};paintBlockPx(S.block,p[0],p[1],bdrag.v,S.bscope);}
+  roomKey='';renderBlockEd();renderRoom();});
+blkCv.addEventListener('pointermove',ev=>{if(!bdrag)return;const p=pt(blkCv,ev,32,60);if(!p)return;
+  if(bdrag.put){const cell=(p[1]/10|0)*4+(p[0]>>3);if(M.blocks[S.block][cell]!==S.char){M.blocks[S.block][cell]=S.char;ver++;}}
+  else{line(bdrag.last,p,(x,y)=>paintBlockPx(S.block,x,y,bdrag.v,S.bscope));bdrag.last=p;}
+  roomKey='';renderBlockEd();renderRoom();});
+const endB=()=>{if(bdrag){bdrag=null;changed();}};blkCv.addEventListener('pointerup',endB);blkCv.addEventListener('pointercancel',endB);
+let cdrag=null;
+chCv.addEventListener('pointerdown',ev=>{if(ev.button>0||!S.char)return;const p=pt(chCv,ev,8,10);if(!p)return;pushUndo();chCv.setPointerCapture(ev.pointerId);
+  const ch=M.chars[S.char],k=0x80>>p[0];cdrag={v:ch[p[1]]&k?0:1};if(cdrag.v)ch[p[1]]|=k;else ch[p[1]]&=~k;ver++;roomKey='';renderCharEd();renderRoom();});
+chCv.addEventListener('pointermove',ev=>{if(!cdrag)return;const p=pt(chCv,ev,8,10);if(!p)return;const ch=M.chars[S.char],k=0x80>>p[0];
+  if(!!(ch[p[1]]&k)!==!!cdrag.v){if(cdrag.v)ch[p[1]]|=k;else ch[p[1]]&=~k;ver++;roomKey='';renderCharEd();renderRoom();}});
+const endC=()=>{if(cdrag){cdrag=null;changed();}};chCv.addEventListener('pointerup',endC);chCv.addEventListener('pointercancel',endC);
+function palPick(cv,ev){const r=cv.getBoundingClientRect(),x=Math.floor((ev.clientX-r.left)/r.width*cv.width/cv._cw),y=Math.floor((ev.clientY-r.top)/r.height*cv.height/cv._ch),k=y*cv._cols+x;return x<cv._cols&&k<cv._ids.length?cv._ids[k]:null;}
+for(const cv of $$('.chpal')){
+  cv.addEventListener('click',ev=>{if(optOn())return;const id=palPick(cv,ev);if(id==null)return;S.char=id;if(cv.id==='chPalB'&&S.bmode==='draw'){S.bmode='put';$('input[name=bmode][value=put]').checked=true;}renderAll();});
+  cv.addEventListener('mousemove',ev=>{const id=palPick(cv,ev);if(id==null){cv.title='';return;}const U=useV();cv.title=id?`caractère ${id} · ${U.cref[id]} cellules · ${U.cu[id]} fois à l'écran · ${blocksTxt(chBlocks(view(),id))}`:'0 : vide';});}
+const libPick=ev=>{const r=libCv.getBoundingClientRect(),x=Math.floor((ev.clientX-r.left)/r.width*libCv.width/40),y=Math.floor((ev.clientY-r.top)/r.height*libCv.height/76),b=y*libCv._cols+x;return x<libCv._cols&&b<view().blocks.length?b:null;};
+libCv.addEventListener('click',ev=>{if(optOn())return;const b=libPick(ev);if(b==null)return;S.block=b;if(S.tab!=='bloc'&&S.tool!=='block')setTab('bloc');renderAll();});
+libCv.addEventListener('dblclick',ev=>{if(optOn()||S.tile==null)return;const b=libPick(ev);if(b==null)return;pushUndo();M.rooms.get(S.room).bl[S.tile]=b;S.block=b;changed();});
+libCv.addEventListener('mousemove',ev=>{const b=libPick(ev);if(b==null){libCv.title='';return;}const U=useV();libCv.title=b?`bloc ${b} · posé ${U.bu[b]} fois · ${roomsTxt(blkRooms(view(),b))}`:'bloc 0 : vide';});
+mapCv.addEventListener('click',ev=>{if(!mapLayout)return;const {L,CW,CH,G,P}=mapLayout,r=mapCv.getBoundingClientRect(),x=(ev.clientX-r.left)/r.width*mapCv.width-P,y=(ev.clientY-r.top)/r.height*mapCv.height-P;
+  for(const [rn,[gx,gy]] of L.pos){const X=gx*(CW+G),Y=gy*(CH+G);if(x>=X&&x<X+CW&&y>=Y&&y<Y+CH){goRoom(rn);return;}}});
+// les salles ou un bloc est pose : [[salle, nombre de cases, premiere case], ...]
+function blkRooms(V,b){const out=[];if(!b)return out;for(const [r,R] of [...V.rooms.entries()].sort((a,c)=>a[0]-c[0])){let n=0,f=-1;R.bl.forEach((x,i)=>{if(x===b&&!(V.murs&&(R.ty[i]&0x1F)===20)){n++;if(f<0)f=i;}});if(n)out.push([r,n,f]);}return out;}
+const roomsTxt=L=>L.length?(L.length>1?'salles ':'salle ')+L.map(([r,n])=>n>1?`${r} (×${n})`:`${r}`).join(', '):'dans aucune salle';
+// l'image d'un sol fragile une fois tombe, choisie comme niveau2exl.py : le trou (type vide) le plus
+// courant du niveau dont la voisine de gauche est du meme genre que la sienne
+function autoTombe(m,r,e,c){const cls=t=>t===20?'m':(t===0||t===9||t===12)?'v':t===3?'p':'s';
+  const cs=(r,e,c)=>{if(c<0){const R=m.rooms.get(r);r=R?R.vo[0]:0;c=9;}else if(c>9){const R=m.rooms.get(r);r=R?R.vo[1]:0;c=0;}return m.rooms.has(r)?[r,e,c]:null;};
+  const ty=k=>k?(m.rooms.get(k[0]).ty[k[1]*10+k[2]]&0x1F):20,g=cls(ty(cs(r,e,c-1)));
+  const freq=f=>{const n=new Map();for(const [rr,R] of m.rooms)for(let ee=0;ee<3;ee++)for(let cc=0;cc<10;cc++)if(f(rr,ee,cc)){const b=R.bl[ee*10+cc];n.set(b,(n.get(b)||0)+1);}let best=null,bn=0;for(const [b,k] of n)if(k>bn){best=b;bn=k;}return best;};
+  let b=freq((rr,ee,cc)=>ty([rr,ee,cc])===0&&cls(ty(cs(rr,ee,cc-1)))===g);if(b==null)b=freq((rr,ee,cc)=>ty([rr,ee,cc])===0);return b||0;}
+// le bloc des debris laisses par une dalle tombee, choisi comme niveau2exl.py : le plus courant des cases
+// debris, parmi les blocs surtout poses sur des cases debris
+function autoDebris(m){const all=[];for(const [r,R] of m.rooms)for(let i=0;i<30;i++)all.push([R.bl[i],R.ty[i]&0x1F]);
+  const use=new Map();for(const [b,t] of all){if(!use.has(b))use.set(b,new Map());const u=use.get(b);u.set(t,(u.get(t)||0)+1);}
+  const dom=b=>{let bt=null,bn=0;for(const [t,n] of use.get(b))if(n>bn){bt=t;bn=n;}return bt;};
+  const freq=f=>{const n=new Map();for(const [b,t] of all)if(f(b,t))n.set(b,(n.get(b)||0)+1);let best=null,bn=0;for(const [b,k] of n)if(k>bn){best=b;bn=k;}return best;};
+  return freq((b,t)=>t===14&&b&&dom(b)===14)||freq((b,t)=>t===14)||0;}
+// les blocs qui emploient un caractere : [[bloc, nombre de cellules], ...]
+function chBlocks(V,id){const out=[];if(!id)return out;V.blocks.forEach((bl,b)=>{if(!b)return;const n=bl.filter(c=>c===id).length;if(n)out.push([b,n]);});return out;}
+const blocksTxt=L=>L.length?(L.length>1?'blocs ':'bloc ')+L.map(([b,n])=>n>1?`${b} (×${n})`:`${b}`).join(', '):'dans aucun bloc';
+function goRoom(r){if(!M.rooms.has(r))return;S.room=r;S.tile=null;roomKey='';renderAll();}
+$('#chUse').addEventListener('click',ev=>{const a=ev.target.closest('a[data-blk]');if(!a)return;ev.preventDefault();S.block=+a.dataset.blk;setTab('bloc');renderAll();});
+$('#blkUse').addEventListener('click',ev=>{const a=ev.target.closest('a[data-go]');if(!a)return;ev.preventDefault();const r=+a.dataset.go;if(!M.rooms.has(r))return;S.room=r;S.tile=+a.dataset.t;roomKey='';renderAll();});
+$('#nav').addEventListener('click',ev=>{const b=ev.target.closest('button[data-go]');if(b)goRoom(+b.dataset.go);});
+$('#insp').addEventListener('change',ev=>{const t=ev.target,R=M.rooms.get(S.room);
+  if(t.dataset.vo!=null){const n=+t.value;if(!(n===0||M.rooms.has(n))){t.classList.add('bad-input');$('#status').textContent=`la salle ${n} n'existe pas`;return;}pushUndo();R.vo[+t.dataset.vo]=n;changed();}
+  else if(t.id==='inBlk'){const b=+t.value;if(!(b>=0&&b<M.blocks.length)){t.classList.add('bad-input');return;}pushUndo();R.bl[S.tile]=b;S.block=b;changed();}
+  else if(t.id==='inTy'){pushUndo();R.ty[S.tile]=+t.value;changed();}
+  else if(t.id==='inDb'){if(t.value===''){if(M.debris!=null){pushUndo();M.debris=null;changed();}return;}const b=+t.value;if(!(b>=1&&b<M.blocks.length)){t.classList.add('bad-input');return;}pushUndo();M.debris=b;changed();}
+  else if(t.id==='inTb'){const e=S.tile/10|0,c=S.tile%10;M.tombe=M.tombe||[];const i=M.tombe.findIndex(v=>v[0]===S.room&&v[1]===e&&v[2]===c);
+    if(t.value===''){if(i>=0){pushUndo();M.tombe.splice(i,1);changed();}return;}
+    const b=+t.value;if(!(b>=0&&b<M.blocks.length)){t.classList.add('bad-input');return;}pushUndo();if(i>=0)M.tombe[i][3]=b;else M.tombe.push([S.room,e,c,b]);changed();}
+  else if(t.id==='inFaT'){const v=+t.value;if(!(v>=1&&v<=8)){t.classList.add('bad-input');return;}pushUndo();M.ftempo=v;changed();}
+  else if(t.id==='inFa1'||t.id==='inFa2'){const b=R.bl[S.tile],a1=+$('#inFa1').value,a2=+$('#inFa2').value;
+    if(![a1,a2].every(x=>x>=0&&x<M.blocks.length)){t.classList.add('bad-input');return;}
+    M.fraga=M.fraga||[];const i=M.fraga.findIndex(v=>v[0]===b);
+    if(a1&&a2){if(i<0&&M.fraga.length>=14){t.classList.add('bad-input');$('#status').textContent='14 animations de sol fragile au plus';return;}pushUndo();if(i<0)M.fraga.push([b,a1,a2]);else M.fraga[i]=[b,a1,a2];changed();}
+    else if(!a1&&!a2&&i>=0){pushUndo();M.fraga.splice(i,1);changed();}}});
+// boutons : contenu des blocs d'origine (sans traits) par case, pour refaire / defaire sans empiler les traits ni les blocs
+const BVO=new Map();
+const sameArr=(a,b)=>a.length===b.length&&a.every((v,q)=>v===b[q]);
+function blockFor(arr){for(let j=1;j<M.blocks.length;j++)if(sameArr(M.blocks[j],arr))return j;return newBlock(arr);}
+// retire les blocs de cands qui ne servent plus nulle part (et les caracteres qui ne servaient qu'a eux)
+function dropUnused(cands){
+  const used=new Set([0]);for(const r of M.rooms.values())r.bl.forEach(b=>used.add(b));for(const b of protSet(M))used.add(b);
+  const del=new Set([...cands].filter(b=>b!=null&&b>0&&b<M.blocks.length&&!used.has(b)));if(!del.size)return 0;
+  const cand=new Set();for(const b of del)for(const c of M.blocks[b])if(c)cand.add(c);
+  const bmap=new Int32Array(M.blocks.length);const nb=[];M.blocks.forEach((b,j)=>{if(del.has(j))return;bmap[j]=nb.length;nb.push(b);});
+  M.blocks=nb;const f=b=>bmap[b];
+  for(const r of M.rooms.values())r.bl=r.bl.map(f);
+  M.pics=M.pics.map(([a,b])=>[f(a),f(b)]);M.portes=M.portes.map(q=>[q[0],q[1],q[2],f(q[3]),f(q[4])]);M.fraga=(M.fraga||[]).map(v=>v.map(f));M.tombe=(M.tombe||[]).map(v=>[v[0],v[1],v[2],f(v[3])]);if(M.debris!=null)M.debris=f(M.debris);if(M.plafond!=null)M.plafond=f(M.plafond);
+  M.enfonce=(M.enfonce||[]).map(v=>[v[0],v[1],v[2],f(v[3]),v[4]!=null?f(v[4]):null]);
+  S.block=del.has(S.block)?0:f(S.block);
+  const cu=new Set();for(const b of M.blocks)for(const c of b)cu.add(c);
+  const cdel=new Set([...cand].filter(c=>!cu.has(c)));
+  if(cdel.size){const cmap=new Int32Array(M.chars.length);const nc=[];M.chars.forEach((ch,j)=>{if(cdel.has(j))return;cmap[j]=nc.length;nc.push(ch);});
+    M.chars=nc;for(const b of M.blocks)for(let q=0;q<24;q++)b[q]=cmap[b[q]];S.char=cdel.has(S.char)?0:cmap[S.char];
+    M.couleurs=(M.couleurs||[]).filter(v=>!cdel.has(v[0])).map(v=>[cmap[v[0]],v[1]]);
+    if(M.flamme)M.flamme=M.flamme.some(c=>cdel.has(c))?null:M.flamme.map(c=>cmap[c]);
+    if(M.bulle)M.bulle=cdel.has(M.bulle)?null:cmap[M.bulle];}
+  ver++;return del.size;}
+function bvMake(){const R=M.rooms.get(S.room),i=S.tile,e=i/10|0,c=i%10;M.enfonce=M.enfonce||[];
+  const H=Math.max(1,Math.min(3,+$('#bvH').value||1)),P=Math.max(0,Math.min(4,+$('#bvS').value)),X0=Math.max(0,Math.min(63,+$('#bvO').value));
+  const en=M.enfonce.find(v=>v[0]===S.room&&v[1]===e&&v[2]===c),hasD=c<9,W=hasD?64:32,kk=`${S.room},${e},${c}`;
+  // blocs de depart : ceux d'origine si on les connait (et que la case montre toujours notre bouton), sinon les blocs « enfoncé », sinon ceux de la salle
+  let o=BVO.get(kk);if(o&&!(en&&sameArr(M.blocks[R.bl[i]],o.uk)))o=null;
+  if(!o)o={k:M.blocks[en?en[3]:R.bl[i]].slice(),d:hasD?M.blocks[en&&en[4]!=null?en[4]:R.bl[i+1]].slice():null};
+  const aK=o.k,aD=o.d;
+  // les 2 dernieres rangees (5e et 6e) des deux cases : 20 lignes de W points
+  const g=[];for(let r=4;r<6;r++)for(let y=0;y<10;y++){const l=[];for(const bb of (hasD?[aK,aD]:[aK]))for(let cx=0;cx<4;cx++){const ch=bb[r*4+cx],v=ch?M.chars[ch][y]:0;for(let k=0;k<8;k++)l.push((v>>(7-k))&1);}g.push(l);}
+  // le dessus de la dalle de cette case : de sa 1re ligne allumee a la derniere suivie d'une ligne vide
+  let yt=-1,yb=-1;for(let y=0;y<20;y++){let on=0;for(let x=0;x<32;x++)on|=g[y][x];if(on){if(yt<0)yt=y;yb=y;}else if(yt>=0)break;}
+  // le dessus touche le haut (decor trame derriere la dalle) : on cherche la dalle depuis le bas, ses lignes
+  // ont des suites d'au moins 3 points allumes (une ligne de trame entre deux telles lignes en fait partie)
+  const mr=y=>{let r=0,m=0;for(let x=0;x<32;x++){r=g[y][x]?r+1:0;if(r>m)m=r;}return m;};
+  const fl=y=>mr(y)>=3||(y>0&&y<19&&mr(y-1)>=3&&mr(y+1)>=3);
+  if(yt>=0&&yt-H<0){yb=-1;for(let y=19;y>=0;y--)if(mr(y)>=3){yb=y;break;}yt=yb;if(yb>=0)while(yt-1>=0&&fl(yt-1))yt--;}
+  const yv=($('#bvY').value||'').trim();if(yv!==''&&yb>=0){const v=Math.round(+yv);if(!isNaN(v))yt=Math.max(0,Math.min(yb,v));}
+  if(yt<0||yt-H<0){$('#status').textContent=yt<0?'pas de dalle dans les 2 dernières rangées de ce bloc':`pas de place au-dessus de la dalle (son dessus est à la ligne ${yt} des 2 dernières rangées) : donnez « dessus à la ligne » plus bas`;return;}
+  const J=y=>X0+Math.round(P*(yb-y));
+  const gv=($('#bvG').value||'').trim();let XL;if(gv===''){let L=g[yb][0];if(c>0){const lb=M.blocks[R.bl[i-1]],r=4+(yb/10|0),ch=lb[r*4+3];L=ch?M.chars[ch][yb%10]&1:0;}XL=L?0:-1;}else XL=Math.round(+gv);if(isNaN(XL))XL=-1;
+  const JL=y=>XL<0?-1:XL+Math.round(P*(yb-y));
+  // enfonce : les traits noirs ; releve : en plus, la dalle entre les traits monte de H points
+  const g0=g.map(l=>l.slice()),eco=$('#bvE').checked;
+  for(let y=yt;y<=yb;y++){const x=JL(y);if(x>=0&&x<W)g[y][x]=0;}
+  for(let y=yt;y<=yb;y++){const x=J(y);if(x>=0&&x<W)g[y][x]=0;}
+  const up=g.map(l=>l.slice());
+  for(let y=yt;y<=yb;y++)for(let x=JL(y)+1;x<Math.min(W,J(y));x++){up[y][x]=0;}
+  for(let y=yt;y<=yb;y++)for(let x=JL(y)+1;x<Math.min(W,J(y));x++)if(g[y][x])up[y-H][x]=1;
+  if(XL>=0)for(let y=yt-H;y<=yb;y++){const x=JL(y);if(x>=0&&x<W)up[y][x]=0;}
+  pushUndo();const key=new Map();M.chars.forEach((ch,j)=>{if(j)key.set(ch.join(','),j);});
+  const old=[R.bl[i],hasD?R.bl[i+1]:null,en&&en[3],en&&en[4]];
+  const mk=(gg,base,off)=>{const nb=base.slice();for(let r=4;r<6;r++)for(let cx=0;cx<4;cx++){const rows=[];for(let y=0;y<10;y++){let v=0;for(let k=0;k<8;k++)v|=gg[(r-4)*10+y][off+cx*8+k]<<(7-k);rows.push(v);}
+    if(rows.every(v=>!v)){nb[r*4+cx]=0;continue;}const ks=rows.join(',');let id=key.get(ks);if(!id){id=newChar(rows);key.set(ks,id);}nb[r*4+cx]=id;}
+    return blockFor(nb);};
+  const gp=eco?g0:g,pK=mk(gp,aK,0),uK=mk(up,aK,0);let pD=null,uD=null;
+  if(hasD){pD=mk(gp,aD,32);uD=mk(up,aD,32);if(pD===uD){R.bl[i+1]=pD;pD=null;uD=null;}}
+  R.bl[i]=uK;if(uD!=null)R.bl[i+1]=uD;
+  const ent=[S.room,e,c,pK,pD];if(en)Object.assign(en,ent);else M.enfonce.push(ent);
+  BVO.set(kk,{k:aK,d:aD,uk:M.blocks[uK].slice()});
+  S.block=uK;const n=dropUnused(old);S.block=R.bl[i];changed();
+  $('#status').textContent=`bouton : relevé ${R.bl[i]}${uD!=null?' + '+R.bl[i+1]:''}, enfoncé ${M.enfonce.find(v=>v[0]===S.room&&v[1]===e&&v[2]===c).slice(3).filter(v=>v!=null).join(' + ')}${n?` (${n} ancien${n>1?'s':''} bloc${n>1?'s':''} du bouton retiré${n>1?'s':''})`:''}`;}
+function bvRaz(){const R=M.rooms.get(S.room),i=S.tile,e=i/10|0,c=i%10,k=(M.enfonce||[]).findIndex(v=>v[0]===S.room&&v[1]===e&&v[2]===c);if(k<0)return;
+  pushUndo();const en=M.enfonce[k],kk=`${S.room},${e},${c}`;let o=BVO.get(kk);if(o&&!sameArr(M.blocks[R.bl[i]],o.uk))o=null;
+  const old=[R.bl[i],c<9?R.bl[i+1]:null,en[3],en[4]];
+  if(o){R.bl[i]=blockFor(o.k);if(o.d&&c<9)R.bl[i+1]=blockFor(o.d);}else{R.bl[i]=en[3];if(en[4]!=null&&c<9)R.bl[i+1]=en[4];}
+  M.enfonce.splice(k,1);BVO.delete(kk);dropUnused(old);changed();}
+$('#insp').addEventListener('click',ev=>{if(ev.target.id==='bvGo'){bvMake();return;}if(ev.target.id==='bvRaz'){bvRaz();return;}if(ev.target.id==='inDep'&&S.tile!=null){pushUndo();M.depart=[S.room,S.tile/10|0,S.tile%10];changed();}});
+$('#toolOpts').addEventListener('change',ev=>{const t=ev.target;if(t.name==='scope'){S.scope=t.value;renderToolOpts();}else if(t.id==='typeBrush')S.typeBrush=+t.value;});
+$('#tools').addEventListener('change',ev=>{S.tool=ev.target.value;renderToolOpts();renderRoom();});
+const setTool=t=>{S.tool=t;$(`input[name=tool][value=${t}]`).checked=true;renderToolOpts();renderRoom();};
+$('#optLogic').addEventListener('change',e=>{S.logic=e.target.checked;renderRoom();});
+$('#optGrid').addEventListener('change',e=>{S.grid=e.target.checked;renderRoom();});
+for(const r of $$('input[name=bmode]'))r.addEventListener('change',e=>{S.bmode=e.target.value;});
+for(const r of $$('input[name=bscope]'))r.addEventListener('change',e=>{S.bscope=e.target.value;});
+$('#blkDup').onclick=()=>{if(!S.block)return;pushUndo();S.block=newBlock(M.blocks[S.block]);changed();};
+$('#blkNew').onclick=()=>{pushUndo();S.block=newBlock();changed();};
+$('#blkPlace').onclick=()=>{if(S.tile==null){$('#status').textContent='choisissez d\'abord une case dans la salle (outil « Choisir »)';return;}pushUndo();M.rooms.get(S.room).bl[S.tile]=S.block;changed();};
+$('#blkBtn').onclick=()=>{if(!S.block)return;const src=M.blocks[S.block];
+  const H=Math.max(1,Math.min(3,+$('#bpH').value||2)),I=Math.max(0,Math.min(10,+$('#bpI').value||0)),P=Math.max(1,Math.min(4,+$('#bpS').value||2)),J=$('#bpJ').checked;
+  // la 5e rangee (cases 16-19) : 10 lignes de 32 points
+  const g=[];for(let y=0;y<10;y++){const l=[];for(let cx=0;cx<4;cx++){const c=src[16+cx],v=c?M.chars[c][y]:0;for(let b=0;b<8;b++)l.push((v>>(7-b))&1);}g.push(l);}
+  // le dessus du sol : sa 1re ligne allumee (la plus haute des colonnes)
+  let t0=10;for(let x=0;x<32;x++)for(let y=0;y<10;y++)if(g[y][x]){t0=Math.min(t0,y);break;}
+  let made=0;const Pq=Math.max(0,Math.min(4,+$('#bpS').value));
+  if(t0<10&&t0-H>=0){
+    // la dalle surelevee : H lignes au-dessus du sol ; chaque ligne plus bas est decalee de Pq points vers
+    // la gauche (perspective) ; la ligne du bas va de I a 31-I-Pq*(H-1)
+    for(let i=0;i<H;i++){const y=t0-H+i,d=Pq*(H-1-i),a=I+d,b=31-I-Pq*(H-1)+d;
+      for(let x=Math.max(0,a);x<=Math.min(31,b);x++){g[y][x]=1;made++;}}
+    if(J){const a=I-Pq,b=31-I-Pq*H;for(let x=Math.max(0,a);x<=Math.min(31,b);x++)if(t0+1<10&&g[t0+1][x])g[t0][x]=0;}}
+  if(!made){$('#status').textContent='ce bloc n\'a pas de sol dans sa 5e rangée (ou pas de place au-dessus) : choisissez un bloc de sol';return;}
+  pushUndo();const nb=src.slice(),key=new Map();M.chars.forEach((c,i)=>{if(i)key.set(c.join(','),i);});
+  for(let cx=0;cx<4;cx++){const rows=[];for(let y=0;y<10;y++){let v=0;for(let b=0;b<8;b++)v|=g[y][cx*8+b]<<(7-b);rows.push(v);}
+    if(rows.every(v=>!v)){nb[16+cx]=0;continue;}const k=rows.join(',');let id=key.get(k);if(!id){id=newChar(rows);key.set(k,id);}nb[16+cx]=id;}
+  S.block=newBlock(nb);changed();$('#status').textContent=`bouton fabriqué : bloc ${S.block} (à poser sur les cases bouton_ouvre / bouton_ferme)`;};
+$('#blkMir').onclick=()=>{if(!S.block)return;pushUndo();const src=M.blocks[S.block],nb=Z24(),key=new Map();M.chars.forEach((c,i)=>{if(i)key.set(c.join(','),i);});
+  const rev=v=>{let r=0;for(let b=0;b<8;b++)if(v&(1<<b))r|=0x80>>b;return r;};
+  for(let cy=0;cy<6;cy++)for(let cx=0;cx<4;cx++){const c=src[cy*4+3-cx];if(!c)continue;const m=M.chars[c].map(rev),k=m.join(',');let id=key.get(k);if(!id){id=newChar(m);key.set(k,id);}nb[cy*4+cx]=id;}
+  S.block=newBlock(nb);changed();};
+$('#tab-car').addEventListener('click',ev=>{const op=ev.target.dataset?.op;if(!op||!S.char)return;pushUndo();const ch=M.chars[S.char];
+  const rev=v=>{let r=0;for(let b=0;b<8;b++)if(v&(1<<b))r|=0x80>>b;return r;};
+  const f={inv:()=>ch.map(v=>~v&255),clr:()=>Z10(),mh:()=>ch.map(rev),mv:()=>ch.slice().reverse(),l:()=>ch.map(v=>(v<<1)&255),r:()=>ch.map(v=>v>>1),u:()=>[...ch.slice(1),0],d:()=>[0,...ch.slice(0,9)]};
+  if(op==='dup'){S.char=newChar(ch);}else M.chars[S.char]=f[op]();changed();});
+$('#chCol').addEventListener('change',e=>{if(!S.char)return;const k=+e.target.value,L=(M.couleurs||[]).filter(v=>v[0]!==S.char);
+  if(k!==7){if(L.length>=7){alert('7 caractères en couleur au plus.');renderCharEd();return;}L.push([S.char,k]);}pushUndo();M.couleurs=L;changed();});
+$('#chReplGo').onclick=()=>{const t=+$('#chRepl').value;if(!S.char||!(t>=0&&t<M.chars.length)||t===S.char)return;pushUndo();for(const b of M.blocks)for(let k=0;k<24;k++)if(b[k]===S.char)b[k]=t;S.char=t;changed();};
+$('#chSort').onchange=e=>{S.charSort=e.target.value;renderSide();};
+for(const id of ['oSpeck','oTolC','oCap','oTolB'])$('#'+id).addEventListener('input',optInput);
+for(const r of $$('input[name=prev]'))r.addEventListener('change',e=>{S.preview=e.target.value;Vkey='';roomKey='';renderOpt();renderRoom();renderLib();scheduleMap();});
+$('#oApply').onclick=()=>{if(!N)return;pushUndo();M=N;N=null;ver++;S.tile=null;S.block=Math.min(S.block,M.blocks.length-1);S.char=Math.min(S.char,M.chars.length-1);resetOptSliders();changed();};
+$('#oReset').onclick=()=>{resetOptSliders();};
+$('#xCompact').onchange=renderExport;
+$('#xMsgs').addEventListener('click',ev=>{const a=ev.target.closest('a[data-go]');if(!a)return;ev.preventDefault();S.room=+a.dataset.go;S.tile=+a.dataset.t;S.block=M.rooms.get(S.room).bl[S.tile];
+  document.querySelector('#room').scrollIntoView({behavior:'smooth',block:'center'});roomKey='';renderAll();});
+$('#xSel').onclick=()=>{const t=$('#xText');t.focus();t.select();};
+$('#xCopy').onclick=()=>{const t=$('#xText');navigator.clipboard.writeText(t.value).then(()=>{$('#xInfo').textContent='copié dans le presse-papiers';},()=>{t.focus();t.select();$('#xInfo').textContent='sélectionné : faites Ctrl+C';});};
+function setTab(t){S.tab=t;for(const b of $$('.tabs button'))b.setAttribute('aria-selected',b.dataset.tab===t);for(const p of $$('.tabpanel'))p.hidden=p.id!=='tab-'+t;
+  N=null;Vkey='';roomKey='';if(t==='opt')resetOptSliders();renderAll();}
+for(const b of $$('.tabs button'))b.onclick=()=>setTab(b.dataset.tab);
+function doUndo(){if(!undo.length)return;redo.push(cloneModel(M));M=undo.pop();ver++;N=null;clampSel();renderAll();save();}
+function doRedo(){if(!redo.length)return;undo.push(cloneModel(M));M=redo.pop();ver++;N=null;clampSel();renderAll();save();}
+$('#btnUndo').onclick=doUndo;$('#btnRedo').onclick=doRedo;
+document.addEventListener('keydown',ev=>{const tg=ev.target.tagName;if(tg==='INPUT'&&ev.target.type!=='radio'&&ev.target.type!=='checkbox'||tg==='TEXTAREA'||tg==='SELECT')return;
+  const k=ev.key.toLowerCase();
+  if((ev.ctrlKey||ev.metaKey)&&k==='z'){ev.preventDefault();ev.shiftKey?doRedo():doUndo();return;}
+  if((ev.ctrlKey||ev.metaKey)&&k==='y'){ev.preventDefault();doRedo();return;}
+  if(ev.altKey&&ev.key.startsWith('Arrow')){const R=M.rooms.get(S.room),k2={ArrowLeft:0,ArrowRight:1,ArrowUp:2,ArrowDown:3}[ev.key];if(R.vo[k2]){ev.preventDefault();goRoom(R.vo[k2]);}return;}
+  if(ev.ctrlKey||ev.metaKey||ev.altKey)return;
+  const t={s:'select',p:'pen',b:'block',t:'type'}[k];if(t)setTool(t);});
+
+// ---------- chargement ----------
+const KEY='exlprince-atelier-v1';let saveTimer=0;
+function save(){clearTimeout(saveTimer);saveTimer=setTimeout(()=>{try{localStorage.setItem(KEY,JSON.stringify({name:nameLoaded,text:serialize(M,false)}));}catch(e){}},700);}
+function banner(kind,html){const b=$('#banner');b.className='banner'+(kind?' '+kind:'');b.innerHTML=html;}
+function load(text,name,kind){
+  let m;try{m=parse(text);}catch(e){banner('err',`<span class="tag">Erreur</span><span>${name} : ${e.message}. Rien n'a été changé.</span>`);return false;}
+  M=m;N=null;ver++;undo=[];redo=[];nameLoaded=name;base=stats(M);S.room=M.rooms.has(M.depart[0])?M.depart[0]:[...M.rooms.keys()][0];S.tile=null;S.block=Math.min(1,M.blocks.length-1);S.char=Math.min(1,M.chars.length-1);
+  const st=base,desc=`${st.nc} caractères, ${st.nb} blocs, ${M.rooms.size} salles`;
+  if(kind==='ex')banner('ex',`<span class="tag">Exemple</span><span>Deux salles dessinées par l'atelier pour la démonstration (${desc}). Ouvrez votre <b>niveau.txt</b>, collez-le, ou déposez-le sur la page.</span>`);
+  else if(kind==='resume')banner('',`<span class="tag">Reprise</span><span>${name||'niveau'} : votre dernier travail, gardé dans ce navigateur (${desc}).</span><button id="bnEx">Charger l'exemple</button>`);
+  else banner('',`<span class="tag">Ouvert</span><span>${name} : ${desc}.</span>`);
+  $('#srcline').textContent=kind==='ex'?'exemple de l\'atelier':name;
+  if(S.tab==='opt')resetOptSliders();renderAll();if(kind!=='resume')save();return true;}
+$('#banner').addEventListener('click',ev=>{if(ev.target.id==='bnEx')load(serialize(demoModel(),false),'exemple','ex');});
+$('#file').addEventListener('change',async ev=>{const f=ev.target.files[0];if(f)load(await f.text(),f.name);ev.target.value='';});
+document.addEventListener('dragover',ev=>{ev.preventDefault();});
+document.addEventListener('drop',async ev=>{ev.preventDefault();const f=ev.dataTransfer.files[0];if(f)load(await f.text(),f.name);});
+$('#btnPaste').onclick=()=>{$('#pastePanel').hidden=false;$('#pasteText').focus();};
+$('#pasteClose').onclick=()=>{$('#pastePanel').hidden=true;};
+$('#pasteGo').onclick=()=>{if(load($('#pasteText').value,'texte collé')){$('#pastePanel').hidden=true;$('#pasteText').value='';}};
+let rz=0;window.addEventListener('resize',()=>{clearTimeout(rz);rz=setTimeout(()=>{renderLib();renderSide();},120);});
+(function boot(){let saved=null;try{saved=JSON.parse(localStorage.getItem(KEY)||'null');}catch(e){}
+  if(!(saved&&saved.text&&load(saved.text,saved.name,'resume')))load(serialize(demoModel(),false),'exemple','ex');})();
+</script>
+
+</body></html>
